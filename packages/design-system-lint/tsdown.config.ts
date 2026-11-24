@@ -9,6 +9,8 @@ export default {
   logLevel: "warn",
   platform: "node",
   sourcemap: false,
-  suppressWarnings:
+  suppressWarnings: [
     "TypeScript 7.0 does not yet have a stable API and is experimental.",
+    "The `tsgo` generator on TypeScript 7.0 is deprecated",
+  ],
 } satisfies UserConfig;
