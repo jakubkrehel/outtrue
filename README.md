@@ -2,17 +2,17 @@
   <img width="320" height="168" alt="interfaces.dev" src="https://ho1jr3x2dcwdu3t5.public.blob.vercel-storage.com/og-readme.png" />
 </a>
 
-# keyline
+# outtrue
 
 Oxlint rules that keep your code on your design system. Every error names the fix, so agents and people correct it in the same run.
 
 ```sh
-pnpm add -D oxlint @jakubkrehel/keyline
+pnpm add -D oxlint outtrue
 ```
 
 ```json
 {
-  "extends": ["./node_modules/@jakubkrehel/keyline/configs/recommended.json"]
+  "extends": ["./node_modules/outtrue/configs/recommended.json"]
 }
 ```
 
@@ -42,14 +42,14 @@ The class rules read Tailwind class names. Requires Oxlint 1.92 or later.
 - **no-inline-style**: A **fixed value** in a `style` object.
 - **single-export-default**: A lone component not written as `export default function`.
 
-Each rule has options for your folders, names and exceptions. They are listed in [OPTIONS.md](packages/keyline/OPTIONS.md).
+Each rule has options for your folders, names and exceptions. They are listed in [OPTIONS.md](packages/outtrue/OPTIONS.md).
 
 ## Existing codebases
 
 Record the violations you already have, so only new ones fail:
 
 ```sh
-pnpm exec oxlint -f json . | pnpm exec keyline-baseline > lint/design-system-baseline.json
+pnpm exec oxlint -f json . | pnpm exec outtrue-baseline > lint/design-system-baseline.json
 ```
 
 Pass each rule its part of that file as the `baseline` option. A file over its count fails and so does a file under it, so the baseline only shrinks.

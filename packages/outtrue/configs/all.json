@@ -2,7 +2,7 @@
   "jsPlugins": [
     {
       "name": "design-system",
-      "specifier": "@jakubkrehel/keyline"
+      "specifier": "outtrue"
     }
   ],
   "rules": {

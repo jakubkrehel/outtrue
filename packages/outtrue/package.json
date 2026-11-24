@@ -1,5 +1,5 @@
 {
-  "name": "@jakubkrehel/keyline",
+  "name": "outtrue",
   "version": "0.1.0",
   "description": "Oxlint rules that keep code on the design system: tokens, props, imports and composition.",
   "keywords": [
@@ -11,17 +11,17 @@
     "oxlint-plugin",
     "tailwind"
   ],
-  "homepage": "https://github.com/jakubkrehel/keyline#readme",
-  "bugs": "https://github.com/jakubkrehel/keyline/issues",
+  "homepage": "https://github.com/jakubkrehel/outtrue#readme",
+  "bugs": "https://github.com/jakubkrehel/outtrue/issues",
   "license": "MIT",
   "author": "Jakub Krehel",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jakubkrehel/keyline.git",
-    "directory": "packages/keyline"
+    "url": "git+https://github.com/jakubkrehel/outtrue.git",
+    "directory": "packages/outtrue"
   },
   "bin": {
-    "keyline-baseline": "baseline.mjs"
+    "outtrue-baseline": "baseline.mjs"
   },
   "files": [
     "dist",

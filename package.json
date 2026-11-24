@@ -1,5 +1,5 @@
 {
-  "name": "keyline-monorepo",
+  "name": "outtrue-monorepo",
   "private": true,
   "workspaces": [
     "packages/*"
