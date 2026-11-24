@@ -21,7 +21,7 @@ export function lint(
   files: Record<string, string>,
   options?: Record<string, unknown>,
 ) {
-  const directory = mkdtempSync(join(tmpdir(), "keyline-"));
+  const directory = mkdtempSync(join(tmpdir(), "desylint-"));
 
   try {
     for (const [path, code] of Object.entries(files)) {
