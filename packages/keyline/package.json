@@ -1,5 +1,5 @@
 {
-  "name": "desylint",
+  "name": "@jakubkrehel/keyline",
   "version": "0.1.0",
   "description": "Oxlint rules that keep code on the design system: tokens, props, imports and composition.",
   "keywords": [
@@ -11,17 +11,17 @@
     "oxlint-plugin",
     "tailwind"
   ],
-  "homepage": "https://github.com/jakubkrehel/desylint#readme",
-  "bugs": "https://github.com/jakubkrehel/desylint/issues",
+  "homepage": "https://github.com/jakubkrehel/keyline#readme",
+  "bugs": "https://github.com/jakubkrehel/keyline/issues",
   "license": "MIT",
   "author": "Jakub Krehel",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jakubkrehel/desylint.git",
-    "directory": "packages/desylint"
+    "url": "git+https://github.com/jakubkrehel/keyline.git",
+    "directory": "packages/keyline"
   },
   "bin": {
-    "desylint-baseline": "baseline.mjs"
+    "keyline-baseline": "baseline.mjs"
   },
   "files": [
     "dist",

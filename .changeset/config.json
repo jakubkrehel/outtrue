@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "jakubkrehel/desylint"
+      "repo": "jakubkrehel/keyline"
     }
   ],
   "access": "public",

@@ -2,7 +2,7 @@
   "jsPlugins": [
     {
       "name": "design-system",
-      "specifier": "desylint"
+      "specifier": "@jakubkrehel/keyline"
     }
   ],
   "rules": {

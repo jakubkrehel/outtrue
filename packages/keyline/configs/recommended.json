@@ -2,28 +2,20 @@
   "jsPlugins": [
     {
       "name": "design-system",
-      "specifier": "desylint"
+      "specifier": "@jakubkrehel/keyline"
     }
   ],
   "rules": {
     "design-system/classname-passthrough": "error",
     "design-system/closed-variants": "error",
-    "design-system/complete-composition": "error",
     "design-system/icon-button-label": "error",
-    "design-system/index-in-sync": "error",
     "design-system/known-tokens": "error",
     "design-system/layout-only-classname": "error",
-    "design-system/no-cross-surface-imports": "error",
-    "design-system/no-deprecated": "error",
     "design-system/no-important": "error",
-    "design-system/no-inline-style": "error",
     "design-system/no-raw-values": "error",
     "design-system/no-reach-in-selectors": "error",
-    "design-system/no-rebuilt-primitives": "error",
     "design-system/one-way-imports": "error",
     "design-system/prefer-shorthand": "error",
-    "design-system/primitive-naming": "error",
-    "design-system/semantic-tokens-only": "error",
-    "design-system/single-export-default": "error"
+    "design-system/primitive-naming": "error"
   }
 }

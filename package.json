@@ -1,5 +1,5 @@
 {
-  "name": "desylint-monorepo",
+  "name": "keyline-monorepo",
   "private": true,
   "workspaces": [
     "packages/*"
