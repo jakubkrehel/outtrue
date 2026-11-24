@@ -1,0 +1,141 @@
+import {
+  attributeName,
+  isClassAttribute,
+  nameOf,
+  type Node,
+  valueNode,
+} from "../lib/ast.ts";
+import {
+  classStrings,
+  PLACEMENT_ROOTS,
+  tokensOf,
+  utilityOf,
+} from "../lib/classes.ts";
+import { ratcheted } from "../lib/ratchet.ts";
+
+const COLOR =
+  /^(?:#(?:[\da-f]{3,4}|[\da-f]{6}|[\da-f]{8})|(?:rgba?|hsla?|oklch|oklab|lab|lch|color)\(.+\))$/i;
+
+const LENGTH = /^(-?\d*\.?\d+)(px|rem)$/;
+
+const ARBITRARY = /^([a-z][a-z\d-]*)-\[(.+)\](\/.+)?$/;
+
+const SPACING_ROOTS = new Set([
+  ...PLACEMENT_ROOTS,
+  "p",
+  "px",
+  "py",
+  "pt",
+  "pr",
+  "pb",
+  "pl",
+  "ps",
+  "pe",
+  "gap",
+  "gap-x",
+  "gap-y",
+  "space-x",
+  "space-y",
+  "translate-x",
+  "translate-y",
+  "indent",
+]);
+
+function rawValueMessage(token: string, spacing: number) {
+  const match = ARBITRARY.exec(utilityOf(token));
+  if (!match) {
+    return null;
+  }
+  const [, root = "", value = ""] = match;
+  if (value.includes("var(") || value.startsWith("--")) {
+    return null;
+  }
+  if (COLOR.test(value)) {
+    return `${token} hardcodes a colour. Use a colour token, or add one to the theme.`;
+  }
+  const length = LENGTH.exec(value);
+  if (!length) {
+    return null;
+  }
+  const [, amount = "", unit] = length;
+  const pixels = Number(amount) * (unit === "rem" ? 16 : 1);
+  const step = pixels / spacing;
+  if (SPACING_ROOTS.has(root) && Number.isInteger(step * 4)) {
+    return `${token} hardcodes a length. ${value} is ${token.replace(`[${value}]`, String(step))} on the spacing scale.`;
+  }
+  return `${token} hardcodes a length. Use a step from the scale, or add a token to the theme.`;
+}
+
+export const noRawValues = ratcheted<{
+  functions?: string[];
+  spacing?: number;
+}>(
+  {
+    functions: { items: { type: "string" }, type: "array" },
+    spacing: { type: "number" },
+  },
+  (
+    _file,
+    { functions = ["cn", "cva", "clsx", "twMerge"], spacing = 4 },
+    report,
+  ) => {
+    const classFunctions = new Set(functions);
+    const isClassCall = (node: Node | undefined) =>
+      node?.type === "CallExpression" &&
+      classFunctions.has(nameOf(node.callee) ?? "");
+    const inspect = (node: Node | undefined) => {
+      for (const { node: origin, text } of classStrings(node)) {
+        for (const token of tokensOf(text)) {
+          const message = rawValueMessage(token, spacing);
+          if (message) {
+            report({ message, node: origin });
+          }
+        }
+      }
+    };
+    const reportColor = (node: Node | undefined) => {
+      if (
+        node?.type === "Literal" &&
+        typeof node.value === "string" &&
+        COLOR.test(node.value)
+      ) {
+        report({
+          message: `${node.value} is a hardcoded colour. Use a colour token: a class, currentColor or a CSS variable.`,
+          node,
+        });
+      }
+    };
+    return {
+      CallExpression(node: Node) {
+        if (!isClassCall(node)) {
+          return;
+        }
+        let current = node.parent;
+        while (current) {
+          if (isClassAttribute(current) || isClassCall(current)) {
+            return;
+          }
+          current = current.parent;
+        }
+        inspect(node);
+      },
+      JSXAttribute(node: Node) {
+        const value = valueNode(node);
+        if (isClassAttribute(node)) {
+          inspect(value);
+          return;
+        }
+        reportColor(value);
+        const style = value?.expression;
+        if (
+          attributeName(node) === "style" &&
+          style?.type === "ObjectExpression"
+        ) {
+          for (const property of style.properties ?? []) {
+            reportColor(valueNode(property));
+          }
+        }
+      },
+    };
+  },
+);

@@ -1,0 +1,26 @@
+{
+  "name": "design-system-lint-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "changeset": "changeset",
+    "version": "changeset version"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "1.0.1",
+    "@changesets/cli": "3.0.3",
+    "oxfmt": "0.80.0",
+    "oxlint": "1.92.0",
+    "turbo": "2.11.13"
+  },
+  "packageManager": "bun@1.3.13"
+}

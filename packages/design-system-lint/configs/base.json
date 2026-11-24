@@ -1,0 +1,13 @@
+{
+  "jsPlugins": [
+    {
+      "name": "design-system",
+      "specifier": "design-system-lint"
+    }
+  ],
+  "rules": {
+    "design-system/layout-only-classname": "error",
+    "design-system/no-raw-values": "error",
+    "design-system/one-way-imports": "error"
+  }
+}

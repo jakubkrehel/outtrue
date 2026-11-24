@@ -1,0 +1,59 @@
+{
+  "name": "design-system-lint",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Oxlint rules that keep code on the design system: tokens, props, imports and composition.",
+  "keywords": [
+    "agents",
+    "ai",
+    "design-system",
+    "lint",
+    "oxlint",
+    "oxlint-plugin",
+    "tailwind"
+  ],
+  "homepage": "https://github.com/jakubkrehel/design-system-lint#readme",
+  "bugs": "https://github.com/jakubkrehel/design-system-lint/issues",
+  "author": "Jakub Krehel",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakubkrehel/design-system-lint.git",
+    "directory": "packages/design-system-lint"
+  },
+  "bin": {
+    "design-system-lint-baseline": "./baseline.mjs"
+  },
+  "files": [
+    "dist",
+    "configs",
+    "baseline.mjs"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/plugin.d.mts",
+      "default": "./dist/plugin.mjs"
+    },
+    "./configs/*.json": "./configs/*.json",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "test": "vitest run",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "oxlint": "1.92.0",
+    "tsdown": "0.23.7",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  },
+  "peerDependencies": {
+    "oxlint": ">=1.92.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
