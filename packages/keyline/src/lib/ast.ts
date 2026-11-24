@@ -2,6 +2,7 @@ export interface Node {
   alternate?: Node;
   arguments?: Node[];
   attributes?: Node[];
+  body?: Node[];
   callee?: Node;
   children?: Node[];
   consequent?: Node;
@@ -13,6 +14,7 @@ export interface Node {
   expression?: Node;
   expressions?: Node[];
   id?: Node;
+  init?: Node;
   key?: Node;
   left?: Node;
   local?: Node;
@@ -58,6 +60,10 @@ export function isClassAttribute(node: Node | undefined) {
   return node?.type === "JSXAttribute" && attributeName(node) === "className";
 }
 
+export function elementOf(opening: Node) {
+  return typeof opening.name === "object" ? opening.name : undefined;
+}
+
 export function rootOf(node: Node | undefined): string | null {
   if (node?.type === "JSXMemberExpression") {
     return rootOf(node.object);
@@ -70,10 +76,6 @@ export function elementName(node: Node | undefined): string {
     return `${elementName(node.object)}.${nameOf(node.property) ?? ""}`;
   }
   return nameOf(node) ?? "";
-}
-
-export function elementOf(opening: Node) {
-  return typeof opening.name === "object" ? opening.name : undefined;
 }
 
 export function stringAttribute(opening: Node, name: string) {

@@ -2,17 +2,17 @@
   <img width="320" height="168" alt="interfaces.dev" src="https://ho1jr3x2dcwdu3t5.public.blob.vercel-storage.com/og-readme.png" />
 </a>
 
-# design-system-lint
+# keyline
 
 Oxlint rules that keep your code on your design system. Every error names the fix, so agents and people correct it in the same run.
 
 ```sh
-pnpm add -D oxlint design-system-lint
+pnpm add -D oxlint keyline
 ```
 
 ```json
 {
-  "extends": ["./node_modules/design-system-lint/configs/recommended.json"]
+  "extends": ["./node_modules/keyline/configs/recommended.json"]
 }
 ```
 
@@ -49,7 +49,11 @@ Each rule has options for your folders, names and exceptions. They are listed in
 Record the violations you already have, so only new ones fail:
 
 ```sh
-pnpm exec oxlint -f json . | pnpm exec design-system-lint-baseline > lint/design-system-baseline.json
+pnpm exec oxlint -f json . | pnpm exec keyline-baseline > lint/design-system-baseline.json
 ```
 
 Pass each rule its part of that file as the `baseline` option. A file over its count fails and so does a file under it, so the baseline only shrinks.
+
+## License
+
+MIT

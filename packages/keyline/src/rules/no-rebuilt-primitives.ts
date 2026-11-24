@@ -1,12 +1,16 @@
 import {
   elementOf,
-  isClassAttribute,
   nameOf,
   type Node,
   stringAttribute,
   valueNode,
 } from "../lib/ast.ts";
-import { classStrings, tokensOf, utilityOf } from "../lib/classes.ts";
+import {
+  classAttribute,
+  classStrings,
+  tokensOf,
+  utilityOf,
+} from "../lib/classes.ts";
 import { isUnder } from "../lib/paths.ts";
 import { ratcheted, type Visitor } from "../lib/ratchet.ts";
 
@@ -55,7 +59,7 @@ export const noRebuiltPrimitives = ratcheted<{
             node,
           });
         }
-        const attribute = (node.attributes ?? []).find(isClassAttribute);
+        const attribute = classAttribute(node);
         if (!(overlay && attribute)) {
           return;
         }

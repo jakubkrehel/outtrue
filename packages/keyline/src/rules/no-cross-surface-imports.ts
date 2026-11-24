@@ -1,5 +1,4 @@
-import { type Node } from "../lib/ast.ts";
-import { resolveImport } from "../lib/paths.ts";
+import { importVisitor } from "../lib/classes.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
 export const noCrossSurfaceImports = ratcheted<{
@@ -36,25 +35,14 @@ export const noCrossSurfaceImports = ratcheted<{
       return null;
     };
     const from = surfaceOf(file);
-    const check = (node: Node) => {
-      const source = node.source?.value;
-      if (!from || typeof source !== "string") {
-        return;
-      }
-      const target = resolveImport(file, source, alias);
-      const to = target ? surfaceOf(target) : null;
-      if (to && to !== from && !shared.includes(to)) {
+    return importVisitor(file, alias, (target, node) => {
+      const to = surfaceOf(target);
+      if (from && to && to !== from && !shared.includes(to)) {
         report({
           message: `${from} imports from ${to}. A component two parts of the product use belongs to the design system. Move it to ${primitives}, or pass it in through props.`,
-          node: node.source ?? node,
+          node,
         });
       }
-    };
-    return {
-      ExportAllDeclaration: check,
-      ExportNamedDeclaration: check,
-      ImportDeclaration: check,
-      ImportExpression: check,
-    };
+    });
   },
 );

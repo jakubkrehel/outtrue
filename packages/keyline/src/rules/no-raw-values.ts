@@ -1,12 +1,12 @@
 import {
   attributeName,
   isClassAttribute,
-  nameOf,
   type Node,
   valueNode,
 } from "../lib/ast.ts";
 import {
-  classStrings,
+  CLASS_FUNCTIONS,
+  classSites,
   PLACEMENT_ROOTS,
   tokensOf,
   utilityOf,
@@ -74,25 +74,17 @@ export const noRawValues = ratcheted<{
     functions: { items: { type: "string" }, type: "array" },
     spacing: { type: "number" },
   },
-  (
-    _file,
-    { functions = ["cn", "cva", "clsx", "twMerge"], spacing = 4 },
-    report,
-  ) => {
-    const classFunctions = new Set(functions);
-    const isClassCall = (node: Node | undefined) =>
-      node?.type === "CallExpression" &&
-      classFunctions.has(nameOf(node.callee) ?? "");
-    const inspect = (node: Node | undefined) => {
-      for (const { node: origin, text } of classStrings(node)) {
+  (_file, { functions = CLASS_FUNCTIONS, spacing = 4 }, report) => {
+    const sites = classSites(functions, (strings) => {
+      for (const { node, text } of strings) {
         for (const token of tokensOf(text)) {
           const message = rawValueMessage(token, spacing);
           if (message) {
-            report({ message, node: origin });
+            report({ message, node });
           }
         }
       }
-    };
+    });
     const reportColor = (node: Node | undefined) => {
       if (
         node?.type === "Literal" &&
@@ -106,25 +98,13 @@ export const noRawValues = ratcheted<{
       }
     };
     return {
-      CallExpression(node: Node) {
-        if (!isClassCall(node)) {
-          return;
-        }
-        let current = node.parent;
-        while (current) {
-          if (isClassAttribute(current) || isClassCall(current)) {
-            return;
-          }
-          current = current.parent;
-        }
-        inspect(node);
-      },
+      ...sites,
       JSXAttribute(node: Node) {
-        const value = valueNode(node);
+        sites["JSXAttribute"]?.(node);
         if (isClassAttribute(node)) {
-          inspect(value);
           return;
         }
+        const value = valueNode(node);
         reportColor(value);
         const style = value?.expression;
         if (

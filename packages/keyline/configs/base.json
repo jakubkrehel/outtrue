@@ -2,7 +2,7 @@
   "jsPlugins": [
     {
       "name": "design-system",
-      "specifier": "design-system-lint"
+      "specifier": "keyline"
     }
   ],
   "rules": {

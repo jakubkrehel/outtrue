@@ -53,8 +53,7 @@ child, since a part may come from there.
 
 ## The index
 
-`index-in-sync` finds a missing component by looking for the file name,
-`button` or `Button`, anywhere in the index. It finds a removed one only on
+`index-in-sync` finds a missing component by looking for the file name, `button` or `Button`, as the label of a list item or inside a code span. A mention in running prose does not count. It finds a removed one only on
 lines shaped like this:
 
 ```md

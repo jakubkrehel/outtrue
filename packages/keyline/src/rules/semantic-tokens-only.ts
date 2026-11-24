@@ -1,4 +1,5 @@
 import {
+  CLASS_FUNCTIONS,
   classSites,
   COLOR_ROOTS,
   PALETTE,
@@ -24,7 +25,7 @@ export const semanticTokensOnly = ratcheted<{
   (
     file,
     {
-      functions = ["cn", "cva", "clsx", "twMerge"],
+      functions = CLASS_FUNCTIONS,
       primitives = ["src/design-system"],
       scales = PALETTE,
       suggest = {},

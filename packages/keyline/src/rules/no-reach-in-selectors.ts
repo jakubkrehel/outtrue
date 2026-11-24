@@ -1,13 +1,17 @@
 import {
   elementName,
   elementOf,
-  isClassAttribute,
-  nameOf,
   type Node,
   rootOf,
   valueNode,
 } from "../lib/ast.ts";
-import { classStrings, tokensOf, variantOf } from "../lib/classes.ts";
+import {
+  classAttribute,
+  classStrings,
+  primitiveImports,
+  tokensOf,
+  variantOf,
+} from "../lib/classes.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
 const REACH_IN = /(?:^|:)(?:\[[^\]]*&[^\]]*\]|\*{1,2}):/;
@@ -15,27 +19,13 @@ const REACH_IN = /(?:^|:)(?:\[[^\]]*&[^\]]*\]|\*{1,2}):/;
 export const noReachInSelectors = ratcheted<{ primitives?: string[] }>(
   { primitives: { items: { type: "string" }, type: "array" } },
   (_file, { primitives = ["@/design-system/components/"] }, report) => {
-    const sources = new Map<string, string>();
+    const { collect, sources } = primitiveImports(primitives);
     return {
-      ImportDeclaration(node: Node) {
-        const source = node.source?.value;
-        if (
-          typeof source !== "string" ||
-          !primitives.some((prefix) => source.startsWith(prefix))
-        ) {
-          return;
-        }
-        for (const specifier of node.specifiers ?? []) {
-          const local = nameOf(specifier.local);
-          if (local) {
-            sources.set(local, source);
-          }
-        }
-      },
+      ImportDeclaration: collect,
       JSXOpeningElement(node: Node) {
         const element = elementOf(node);
         const source = sources.get(rootOf(element) ?? "");
-        const attribute = (node.attributes ?? []).find(isClassAttribute);
+        const attribute = classAttribute(node);
         if (!(source && attribute)) {
           return;
         }

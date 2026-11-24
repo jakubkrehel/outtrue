@@ -14,10 +14,30 @@ function pascalCase(name: string) {
 
 function mentions(text: string, name: string) {
   const escaped = name.replaceAll(/[$()*+.?[\\\]^{|}]/g, "\\$&");
-  return new RegExp(`(?:^|[^\\w-])${escaped}(?:[^\\w-]|$)`, "m").test(text);
+  return new RegExp(
+    `^\\s*[-*]\\s+${escaped}[^\\w-]|\`(?:[\\w@.-]+/)*${escaped}(?:\\.[jt]sx?)?\``,
+    "m",
+  ).test(text);
 }
 
 const INDEX_ENTRY = /^\s*[-*]\s+[\w<][^:`]*:\s.*`([\w@./-]+)`\s*$/;
+
+const indexes = new Map<string, { files: string[]; text: string | null }>();
+
+function readIndex(cwd: string, index: string, primitives: string[]) {
+  const key = `${cwd}\n${index}\n${primitives.join("\n")}`;
+  const cached = indexes.get(key);
+  if (cached) {
+    return cached;
+  }
+  const path = join(cwd, index);
+  const read = {
+    files: primitives.flatMap((folder) => sourceFiles(cwd, folder)),
+    text: existsSync(path) ? readFileSync(path, "utf8") : null,
+  };
+  indexes.set(key, read);
+  return read;
+}
 
 export const indexInSync = ratcheted<{
   ignore?: string[];
@@ -50,12 +70,11 @@ export const indexInSync = ratcheted<{
         if (!isListed(file)) {
           return;
         }
-        const files = primitives
-          .flatMap((folder) => sourceFiles(cwd, folder))
-          .filter(isListed);
+        const read = readIndex(cwd, index, primitives);
+        const files = read.files.filter(isListed);
         const isFirst = files[0] === file;
-        const path = join(cwd, index);
-        if (!existsSync(path)) {
+        const { text } = read;
+        if (text === null) {
           if (isFirst) {
             report({
               message: `${index} does not exist. Create it with one line per component.`,
@@ -64,7 +83,6 @@ export const indexInSync = ratcheted<{
           }
           return;
         }
-        const text = readFileSync(path, "utf8");
         const stem = file.replace(SOURCE_FILE, "");
         const base = posix.basename(stem);
         if (!(mentions(text, base) || mentions(text, pascalCase(base)))) {

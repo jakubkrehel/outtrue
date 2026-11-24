@@ -1,5 +1,10 @@
 import { valueNode } from "../lib/ast.ts";
-import { classSites, tokensOf, variantOf } from "../lib/classes.ts";
+import {
+  CLASS_FUNCTIONS,
+  classSites,
+  tokensOf,
+  variantOf,
+} from "../lib/classes.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
 const SCREEN_HEIGHT = /^((?:min-|max-)?h)-screen$/;
@@ -49,11 +54,7 @@ export const preferShorthand = ratcheted<{
     compose: { type: "string" },
     functions: { items: { type: "string" }, type: "array" },
   },
-  (
-    _file,
-    { compose = "cn", functions = ["cn", "cva", "clsx", "twMerge"] },
-    report,
-  ) =>
+  (_file, { compose = "cn", functions = CLASS_FUNCTIONS }, report) =>
     classSites(functions, (strings, attribute) => {
       const expression = valueNode(attribute)?.expression;
       if (

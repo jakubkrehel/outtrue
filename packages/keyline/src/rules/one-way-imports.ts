@@ -1,5 +1,4 @@
-import { type Node } from "../lib/ast.ts";
-import { resolveImport } from "../lib/paths.ts";
+import { importVisitor } from "../lib/classes.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
 export const oneWayImports = ratcheted<{
@@ -23,25 +22,14 @@ export const oneWayImports = ratcheted<{
         (layer) => path === layer || path.startsWith(`${layer}/`),
       );
     const from = layerOf(file);
-    const check = (node: Node) => {
-      const source = node.source?.value;
-      if (from === -1 || typeof source !== "string") {
-        return;
-      }
-      const target = resolveImport(file, source, alias);
-      const to = target ? layerOf(target) : -1;
-      if (to > from) {
+    return importVisitor(file, alias, (target, node) => {
+      const to = layerOf(target);
+      if (from !== -1 && to > from) {
         report({
           message: `${layers[from]} sits below ${layers[to]} and can't import from it. Pass what this needs through props, or move the file up to ${layers[to]}.`,
-          node: node.source ?? node,
+          node,
         });
       }
-    };
-    return {
-      ExportAllDeclaration: check,
-      ExportNamedDeclaration: check,
-      ImportDeclaration: check,
-      ImportExpression: check,
-    };
+    });
   },
 );

@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  CLASS_FUNCTIONS,
   classSites,
   COLOR_ROOTS,
   PALETTE,
@@ -68,7 +69,7 @@ export const knownTokens = ratcheted<{
     _file,
     {
       defaults = true,
-      functions = ["cn", "cva", "clsx", "twMerge"],
+      functions = CLASS_FUNCTIONS,
       theme = ["src/app/globals.css"],
     },
     report,

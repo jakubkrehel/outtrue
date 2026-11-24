@@ -5,6 +5,7 @@ import {
   type Node,
   rootOf,
 } from "../lib/ast.ts";
+import { primitiveImports } from "../lib/classes.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
 type Part = string | string[];
@@ -49,23 +50,9 @@ export const completeComposition = ratcheted<{
     report,
   ) => {
     const open: Composition[] = [];
-    const imported = new Set<string>();
+    const { collect, sources } = primitiveImports(primitives);
     return {
-      ImportDeclaration(node: Node) {
-        const source = node.source?.value;
-        if (
-          typeof source !== "string" ||
-          !primitives.some((prefix) => source.startsWith(prefix))
-        ) {
-          return;
-        }
-        for (const specifier of node.specifiers ?? []) {
-          const local = nameOf(specifier.local);
-          if (local) {
-            imported.add(local);
-          }
-        }
-      },
+      ImportDeclaration: collect,
       JSXElement(node: Node) {
         const opening = node.openingElement;
         const name = opening ? elementName(elementOf(opening)) : "";
@@ -89,7 +76,7 @@ export const completeComposition = ratcheted<{
         if (
           opening &&
           required &&
-          imported.has(rootOf(elementOf(opening)) ?? "")
+          sources.has(rootOf(elementOf(opening)) ?? "")
         ) {
           open.push({
             missing: [...required],

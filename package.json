@@ -1,5 +1,5 @@
 {
-  "name": "design-system-lint-monorepo",
+  "name": "keyline-monorepo",
   "private": true,
   "workspaces": [
     "packages/*"

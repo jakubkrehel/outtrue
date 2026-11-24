@@ -1,4 +1,9 @@
-import { classSites, tokensOf, variantOf } from "../lib/classes.ts";
+import {
+  CLASS_FUNCTIONS,
+  classSites,
+  tokensOf,
+  variantOf,
+} from "../lib/classes.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
 export const noImportant = ratcheted<{
@@ -9,11 +14,7 @@ export const noImportant = ratcheted<{
     allow: { items: { type: "string" }, type: "array" },
     functions: { items: { type: "string" }, type: "array" },
   },
-  (
-    _file,
-    { allow = [], functions = ["cn", "cva", "clsx", "twMerge"] },
-    report,
-  ) => {
+  (_file, { allow = [], functions = CLASS_FUNCTIONS }, report) => {
     const allowed = allow.map((pattern) => new RegExp(pattern));
     return classSites(functions, (strings) => {
       for (const { node, text } of strings) {

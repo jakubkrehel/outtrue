@@ -1,7 +1,6 @@
 {
-  "name": "design-system-lint",
-  "version": "0.0.0",
-  "private": true,
+  "name": "keyline",
+  "version": "0.1.0",
   "description": "Oxlint rules that keep code on the design system: tokens, props, imports and composition.",
   "keywords": [
     "agents",
@@ -12,16 +11,17 @@
     "oxlint-plugin",
     "tailwind"
   ],
-  "homepage": "https://github.com/jakubkrehel/design-system-lint#readme",
-  "bugs": "https://github.com/jakubkrehel/design-system-lint/issues",
+  "homepage": "https://github.com/jakubkrehel/keyline#readme",
+  "bugs": "https://github.com/jakubkrehel/keyline/issues",
+  "license": "MIT",
   "author": "Jakub Krehel",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jakubkrehel/design-system-lint.git",
-    "directory": "packages/design-system-lint"
+    "url": "git+https://github.com/jakubkrehel/keyline.git",
+    "directory": "packages/keyline"
   },
   "bin": {
-    "design-system-lint-baseline": "./baseline.mjs"
+    "keyline-baseline": "baseline.mjs"
   },
   "files": [
     "dist",
@@ -37,6 +37,9 @@
     },
     "./configs/*.json": "./configs/*.json",
     "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsdown",

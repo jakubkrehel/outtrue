@@ -1,14 +1,15 @@
 import {
   elementName,
-  isClassAttribute,
-  nameOf,
+  elementOf,
   type Node,
   rootOf,
   valueNode,
 } from "../lib/ast.ts";
 import {
+  classAttribute,
   classStrings,
   PLACEMENT_ROOTS,
+  primitiveImports,
   tokensOf,
   utilityOf,
 } from "../lib/classes.ts";
@@ -45,27 +46,13 @@ export const layoutOnlyClassName = ratcheted<{
     report,
   ) => {
     const allowed = allow.map((pattern) => new RegExp(pattern));
-    const sources = new Map<string, string>();
+    const { collect, sources } = primitiveImports(primitives);
     return {
-      ImportDeclaration(node: Node) {
-        const source = node.source?.value;
-        if (
-          typeof source !== "string" ||
-          !primitives.some((prefix) => source.startsWith(prefix))
-        ) {
-          return;
-        }
-        for (const specifier of node.specifiers ?? []) {
-          const local = nameOf(specifier.local);
-          if (local) {
-            sources.set(local, source);
-          }
-        }
-      },
+      ImportDeclaration: collect,
       JSXOpeningElement(node: Node) {
-        const element = typeof node.name === "object" ? node.name : undefined;
+        const element = elementOf(node);
         const source = sources.get(rootOf(element) ?? "");
-        const attribute = (node.attributes ?? []).find(isClassAttribute);
+        const attribute = classAttribute(node);
         if (!(source && attribute)) {
           return;
         }

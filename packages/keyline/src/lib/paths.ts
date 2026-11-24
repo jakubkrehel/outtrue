@@ -1,6 +1,18 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join, posix, relative, sep } from "node:path";
 
+export function resolveImport(
+  file: string,
+  source: string,
+  alias: Record<string, string>,
+) {
+  if (source.startsWith(".")) {
+    return posix.join(posix.dirname(file), source);
+  }
+  const prefix = Object.keys(alias).find((key) => source.startsWith(key));
+  return prefix ? `${alias[prefix]}${source.slice(prefix.length)}` : null;
+}
+
 export function isUnder(file: string, folders: string[]) {
   return folders.some((folder) =>
     file.startsWith(folder.endsWith("/") ? folder : `${folder}/`),
@@ -20,16 +32,4 @@ export function sourceFiles(cwd: string, folder: string): string[] {
       relative(cwd, join(entry.parentPath, entry.name)).split(sep).join("/"),
     )
     .toSorted();
-}
-
-export function resolveImport(
-  file: string,
-  source: string,
-  alias: Record<string, string>,
-) {
-  if (source.startsWith(".")) {
-    return posix.join(posix.dirname(file), source);
-  }
-  const prefix = Object.keys(alias).find((key) => source.startsWith(key));
-  return prefix ? `${alias[prefix]}${source.slice(prefix.length)}` : null;
 }
