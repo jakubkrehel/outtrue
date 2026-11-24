@@ -8,11 +8,7 @@ test("reports longhand classes", () => {
       'export default function Fixture({ wide }: { wide: boolean }) {\n  return (\n    <div className={`flex ${wide ? "p-4" : "p-2"}`}>\n      <span className="h-4 w-4 h-screen z-[999]" />\n    </div>\n  );\n}\n',
   });
 
-  expect(result["src/app/page.tsx"]).toHaveLength(4);
-
-  expect(result["src/app/page.tsx"]?.join("\n")).toContain(
-    "Compose classes with cn()",
-  );
+  expect(result["src/app/page.tsx"]).toHaveLength(3);
 
   expect(result["src/app/page.tsx"]?.join("\n")).toContain("Use size-4");
 

@@ -14,6 +14,7 @@
     "design-system/no-important": "error",
     "design-system/no-raw-values": "error",
     "design-system/no-reach-in-selectors": "error",
+    "design-system/no-template-classname": "error",
     "design-system/one-way-imports": "error",
     "design-system/prefer-shorthand": "error",
     "design-system/primitive-naming": "error"

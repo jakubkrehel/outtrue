@@ -23,7 +23,7 @@ The class rules read Tailwind class names. Requires Oxlint 1.92 or later.
 ## Rules
 
 - **no-raw-values**: Hardcoded **lengths** and **colors** in classes, attributes and inline styles.
-- **layout-only-classname**: A `className` that **restyles a primitive**. It can only place it.
+- **layout-only-classname**: A `className` that **restyles a primitive**. It can only place it or arrange its children.
 - **one-way-imports**: An import from a **level above**.
 - **no-rebuilt-primitives**: A raw `<button>`, `<input>` or hand-built overlay where a **primitive already exists**.
 - **index-in-sync**: A component **missing from the index** or an index line whose file is gone.
@@ -32,7 +32,8 @@ The class rules read Tailwind class names. Requires Oxlint 1.92 or later.
 - **semantic-tokens-only**: A **raw palette class** such as `text-gray-900` outside the design system.
 - **no-deprecated**: A **deprecated** component, prop or import path.
 - **primitive-naming**: A primitive **named after a page or a variant**, such as `pricing-card-pro`.
-- **prefer-shorthand**: `w-4 h-4`, `h-screen`, an arbitrary `z-[n]` and template-literal class strings.
+- **prefer-shorthand**: `w-4 h-4`, `h-screen` and an arbitrary `z-[n]`.
+- **no-template-classname**: A `className` built with a **template literal** where `cn()` belongs.
 - **icon-button-label**: An **icon-only button** with no `aria-label`.
 - **no-cross-surface-imports**: One part of the product **importing a component from another**.
 - **no-reach-in-selectors**: A class that **styles the inside of a primitive**, such as `[&_svg]:size-4`.

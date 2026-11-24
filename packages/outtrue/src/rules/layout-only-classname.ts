@@ -28,8 +28,11 @@ const LAYOUT_ROOTS = [
   "shrink",
 ].join("|");
 
+const ARRANGEMENT =
+  "(?:inline-)?flex|flex-(?:row|col)(?:-reverse)?|(?:gap|gap-x|gap-y|items|justify|translate|translate-x|translate-y|scroll-m[xytrblse]?)-.+";
+
 const LAYOUT = new RegExp(
-  `^(?:(?:${LAYOUT_ROOTS})-.+|flex-(?:1|auto|none|initial)|grow|shrink|absolute|relative|fixed|sticky|static|hidden|block|inline-block|(?:group|peer)(?:/.+)?)$`,
+  `^(?:(?:${LAYOUT_ROOTS})-.+|flex-(?:1|auto|none|initial)|grow|shrink|absolute|relative|fixed|sticky|static|hidden|block|inline-block|(?:group|peer)(?:/.+)?|${ARRANGEMENT})$`,
 );
 
 export const layoutOnlyClassName = ratcheted<{

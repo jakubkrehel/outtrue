@@ -31,3 +31,12 @@ test("accepts scale steps, tokens and variables", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(0);
 });
+
+test("leaves colour text in attributes that hold content", () => {
+  const result = lint("no-raw-values", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <input\n      aria-label="oklch(0.7 0.1 250)"\n      defaultValue="#ff0000"\n      placeholder="oklch(0.7 0.1 250)"\n    />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});

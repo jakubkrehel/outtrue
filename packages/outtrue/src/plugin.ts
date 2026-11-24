@@ -10,6 +10,7 @@ import { noDeprecated } from "./rules/no-deprecated.ts";
 import { noImportant } from "./rules/no-important.ts";
 import { noInlineStyle } from "./rules/no-inline-style.ts";
 import { noRawValues } from "./rules/no-raw-values.ts";
+import { noTemplateClassname } from "./rules/no-template-classname.ts";
 import { noReachInSelectors } from "./rules/no-reach-in-selectors.ts";
 import { noRebuiltPrimitives } from "./rules/no-rebuilt-primitives.ts";
 import { oneWayImports } from "./rules/one-way-imports.ts";
@@ -35,6 +36,7 @@ const plugin = {
     "no-raw-values": noRawValues,
     "no-reach-in-selectors": noReachInSelectors,
     "no-rebuilt-primitives": noRebuiltPrimitives,
+    "no-template-classname": noTemplateClassname,
     "one-way-imports": oneWayImports,
     "prefer-shorthand": preferShorthand,
     "primitive-naming": primitiveNaming,

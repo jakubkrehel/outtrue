@@ -66,15 +66,36 @@ function rawValueMessage(token: string, spacing: number) {
   return `${token} hardcodes a length. Use a step from the scale, or add a token to the theme.`;
 }
 
+const TEXT_ATTRIBUTES = [
+  "alt",
+  "aria-description",
+  "aria-label",
+  "defaultValue",
+  "label",
+  "placeholder",
+  "title",
+  "value",
+];
+
 export const noRawValues = ratcheted<{
   functions?: string[];
   spacing?: number;
+  text?: string[];
 }>(
   {
     functions: { items: { type: "string" }, type: "array" },
     spacing: { type: "number" },
+    text: { items: { type: "string" }, type: "array" },
   },
-  (_file, { functions = CLASS_FUNCTIONS, spacing = 4 }, report) => {
+  (
+    _file,
+    {
+      functions = CLASS_FUNCTIONS,
+      spacing = 4,
+      text: textAttributes = TEXT_ATTRIBUTES,
+    },
+    report,
+  ) => {
     const sites = classSites(functions, (strings) => {
       for (const { node, text } of strings) {
         for (const token of tokensOf(text)) {
@@ -101,7 +122,10 @@ export const noRawValues = ratcheted<{
       ...sites,
       JSXAttribute(node: Node) {
         sites["JSXAttribute"]?.(node);
-        if (isClassAttribute(node)) {
+        if (
+          isClassAttribute(node) ||
+          textAttributes.includes(attributeName(node) ?? "")
+        ) {
           return;
         }
         const value = valueNode(node);

@@ -38,3 +38,12 @@ test("accepts classes the allow option lists", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(0);
 });
+
+test("accepts classes that arrange children or offset the component", () => {
+  const result = lint("layout-only-classname", {
+    "src/app/page.tsx":
+      'import Button from "@/design-system/components/button";\nexport default function Fixture() {\n  return (\n    <Button className="inline-flex -translate-x-1/2 scroll-mt-20 flex-col items-center justify-between gap-2">\n      Save\n    </Button>\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});
