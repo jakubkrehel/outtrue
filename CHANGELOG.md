@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
+
+2026-11-25
 
 - A `primitives` folder that does not exist is now reported instead of silently turning the primitive rules off. The same goes for a project with no folder set and no `src/design-system`.
 - `layout-only-classname` accepts `sr-only` and `not-sr-only` on a primitive.
