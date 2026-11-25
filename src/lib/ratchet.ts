@@ -1,5 +1,6 @@
 import { relative, sep } from "node:path";
 import { type Node } from "./ast.ts";
+import { missingFolder } from "./paths.ts";
 
 export interface Report {
   message: string;
@@ -36,6 +37,33 @@ function sharedPrimitives(
   return { primitives: takesOne ? folders[0] : folders };
 }
 
+const DEFAULT_ROOT = "src/design-system";
+
+const warned = new Set<string>();
+
+function primitivesWarning(
+  cwd: string,
+  properties: Record<string, unknown>,
+  options: { alias?: Record<string, string>; primitives?: string | string[] },
+) {
+  if (!("primitives" in properties)) {
+    return null;
+  }
+  const alias = options.alias ?? { "@/": "src/" };
+  if (!options.primitives) {
+    return missingFolder(cwd, DEFAULT_ROOT, alias)
+      ? `No primitives folder is set and ${DEFAULT_ROOT} does not exist, so the rules that check primitives report nothing. Set settings["design-system"].primitives to the folder that holds yours.`
+      : null;
+  }
+  const missing = [options.primitives]
+    .flat()
+    .map((entry) => missingFolder(cwd, entry, alias))
+    .find(Boolean);
+  return missing
+    ? `primitives is set to ${missing}, which does not exist, so the rules that check primitives report nothing. Point it at the folder that holds yours.`
+    : null;
+}
+
 export function ratcheted<Options>(
   properties: Record<string, unknown>,
   create: (
@@ -62,8 +90,16 @@ export function ratcheted<Options>(
         },
         context.cwd,
       );
+      const warning = primitivesWarning(context.cwd, properties, options);
       return {
         ...visitor,
+        Program(program) {
+          visitor["Program"]?.(program);
+          if (warning && !warned.has(warning)) {
+            warned.add(warning);
+            context.report({ message: warning, node: program });
+          }
+        },
         "Program:exit"(program) {
           visitor["Program:exit"]?.(program);
           if (reports.length > allowance) {

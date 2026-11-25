@@ -18,3 +18,17 @@ test("reports a class that styles the inside of a primitive", () => {
     "*:rounded-none on <Button>",
   );
 });
+
+test("lets a primitive style its own inside", () => {
+  const result = lint(
+    "no-reach-in-selectors",
+    {
+      "src/components/ui/button.tsx":
+        'export default function Button({ className }: { className?: string }) {\n  return (\n    <button className="[&_svg]:size-4 [&_svg]:pointer-events-none" />\n  );\n}\n',
+    },
+    undefined,
+    { primitives: "src/components/ui" },
+  );
+
+  expect(result["src/components/ui/button.tsx"]).toHaveLength(0);
+});

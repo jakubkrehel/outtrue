@@ -32,7 +32,7 @@ const ARRANGEMENT =
   "(?:inline-)?(?:flex|grid)|flex-(?:row|col)(?:-reverse)?|flex-(?:no)?wrap(?:-reverse)?|(?:gap|gap-x|gap-y|items|justify|justify-items|content|place-items|place-content|grid-cols|grid-rows|grid-flow|auto-cols|auto-rows|space-x|space-y|aspect|translate|translate-x|translate-y|scroll-m[xytrblse]?)-.+";
 
 const LAYOUT = new RegExp(
-  `^(?:(?:${LAYOUT_ROOTS})-.+|flex-(?:1|auto|none|initial)|grow|shrink|absolute|relative|fixed|sticky|static|hidden|block|inline-block|(?:group|peer)(?:/.+)?|${ARRANGEMENT})$`,
+  `^(?:(?:${LAYOUT_ROOTS})-.+|flex-(?:1|auto|none|initial)|grow|shrink|absolute|relative|fixed|sticky|static|hidden|block|inline-block|(?:not-)?sr-only|(?:group|peer)(?:/.+)?|${ARRANGEMENT})$`,
 );
 
 export const layoutOnlyClassName = ratcheted<{

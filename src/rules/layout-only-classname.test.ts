@@ -79,3 +79,21 @@ test("reads the primitives folder from the shared setting", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(1);
 });
+
+test("accepts classes that hide a primitive from sight", () => {
+  const result = lint("layout-only-classname", {
+    "src/app/page.tsx":
+      'import { Button } from "@/design-system/components/button";\n\nexport default function Fixture() {\n  return (\n    <Button className="sr-only focus:not-sr-only md:hidden" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});
+
+test("leaves elements and components from other folders alone", () => {
+  const result = lint("layout-only-classname", {
+    "src/app/page.tsx":
+      'import Link from "next/link";\nimport { Chart } from "@/components/chart";\n\nexport default function Fixture() {\n  return (\n    <div className="bg-red-500">\n      <Link className="text-sm underline" href="/" />\n      <Chart className="rounded-lg" />\n    </div>\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});

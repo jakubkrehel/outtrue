@@ -18,3 +18,16 @@ test("reports an import from a higher level", () => {
 
   expect(result["src/components/pricing.tsx"]).toHaveLength(0);
 });
+
+test("accepts imports that point down and ones from packages", () => {
+  const result = lint("one-way-imports", {
+    "src/app/page.tsx":
+      'import Link from "next/link";\nimport { Card } from "@/components/card";\nimport { Button } from "@/design-system/components/button";\nimport { helper } from "./helper";\n\nexport default function Fixture() {\n  return <Card><Button /><Link href="/" />{helper}</Card>;\n}\n',
+    "src/components/card.tsx":
+      'import { Button } from "../design-system/components/button";\n\nexport function Card() {\n  return <Button />;\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+
+  expect(result["src/components/card.tsx"]).toHaveLength(0);
+});

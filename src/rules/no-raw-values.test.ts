@@ -51,3 +51,30 @@ test("reports a color inside a longer value and names w-px", () => {
 
   expect(result["src/app/page.tsx"]?.join("\n")).toContain("1px is w-px");
 });
+
+test("accepts arbitrary values that are not a fixed length or color", () => {
+  const result = lint("no-raw-values", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <div className="top-[50%] max-w-[65ch] w-[calc(100%-2rem)] translate-x-[-50%] grid-cols-[1fr_2fr] aspect-[16/9] rotate-[3deg] duration-[250ms] leading-[1.4] tracking-[-0.01em] has-[>svg]:px-3 data-[state=open]:flex" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});
+
+test("leaves hashes that are not colors", () => {
+  const result = lint("no-raw-values", {
+    "src/app/page.tsx":
+      'export default function Fixture({ color }: { color: string }) {\n  return (\n    <a href="#top" id="#1" style={{ backgroundColor: color, width: "50%" }}>\n      <img alt="#fff" src="/logo.svg#mark" />\n    </a>\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});
+
+test("reads classes inside cva and constants", () => {
+  const result = lint("no-raw-values", {
+    "src/app/page.tsx":
+      'import { cva } from "class-variance-authority";\n\nconst WIDTHS = { sm: "w-24", lg: "w-[320px]" };\n\nconst variants = cva("inline-flex", {\n  variants: { size: { sm: "h-8", lg: "h-[44px]" } },\n});\n\nexport default function Fixture() {\n  return <div className={WIDTHS.lg}>{variants()}</div>;\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(2);
+});

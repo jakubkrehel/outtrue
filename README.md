@@ -10,6 +10,8 @@ Read more in [Interfaces](https://interfaces.dev/?utm_source=outtrue), the first
 
 Oxlint rules that keep your code on your design system. Every error names the fix, so agents and people correct it in the same run.
 
+The rules read Tailwind class names in React code and require Oxlint 1.92 or later.
+
 ```sh
 npm i -D oxlint outtrue
 ```
@@ -21,11 +23,9 @@ npm i -D oxlint outtrue
 }
 ```
 
-Set `primitives` to the folder that holds yours. The default is `src/design-system/components`. With the wrong folder the rules that check primitives report nothing.
+Set `primitives` to the folder that holds yours. The default is `src/design-system/components`. A folder that does not exist is reported as an error.
 
 There are three configs. `base` has the three rules to start with, `recommended` adds nine more and `all` turns on all twenty.
-
-The class rules read Tailwind class names and require Oxlint 1.92 or later.
 
 Current list of rules:
 
@@ -51,6 +51,8 @@ Current list of rules:
 - `single-export-default`: a lone component not written as `export default function`.
 
 Every rule has options for your folders, names and exceptions. They are in [OPTIONS.md](OPTIONS.md), along with how to adopt the rules in a codebase that already breaks them.
+
+Releases are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

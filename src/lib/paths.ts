@@ -33,3 +33,18 @@ export function sourceFiles(cwd: string, folder: string): string[] {
     )
     .toSorted();
 }
+
+export function missingFolder(
+  cwd: string,
+  entry: string,
+  alias: Record<string, string>,
+) {
+  const prefix = Object.keys(alias).find((key) => entry.startsWith(key));
+  const folder = (
+    prefix ? `${alias[prefix]}${entry.slice(prefix.length)}` : entry
+  ).replace(/\/$/, "");
+  const [root = ""] = folder.split("/");
+  return existsSync(join(cwd, root)) && !existsSync(join(cwd, folder))
+    ? folder
+    : null;
+}

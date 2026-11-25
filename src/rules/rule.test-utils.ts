@@ -22,9 +22,33 @@ export function lint(
   options?: Record<string, unknown>,
   settings?: Record<string, unknown>,
 ) {
+  const configured = [options?.["primitives"], settings?.["primitives"]]
+    .flat()
+    .filter(
+      (entry): entry is string =>
+        typeof entry === "string" && !entry.startsWith("@"),
+    );
+
+  return lintBare(rule, files, options, settings, [
+    "src/design-system/components",
+    ...configured,
+  ]);
+}
+
+export function lintBare(
+  rule: string,
+  files: Record<string, string>,
+  options?: Record<string, unknown>,
+  settings?: Record<string, unknown>,
+  folders: string[] = [],
+) {
   const directory = mkdtempSync(join(tmpdir(), "outtrue-"));
 
   try {
+    for (const folder of folders) {
+      mkdirSync(join(directory, folder), { recursive: true });
+    }
+
     for (const [path, code] of Object.entries(files)) {
       const file = join(directory, path);
 

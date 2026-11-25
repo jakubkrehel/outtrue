@@ -10,6 +10,8 @@ Set the primitives folder once for every rule that needs it. A rule's own `primi
 }
 ```
 
+A `primitives` folder that does not exist is reported once per run. So is a project with no folder set and no `src/design-system`. An import prefix that points at a package is not checked.
+
 With no theme file found, `known-tokens` reports nothing.
 
 | Rule                             | Option                                                                                                          | Default                                                                                                 |
