@@ -13,7 +13,6 @@
     "design-system/index-in-sync": "error",
     "design-system/known-tokens": "error",
     "design-system/layout-only-classname": "error",
-    "design-system/motion-tokens": "error",
     "design-system/no-boolean-variants": "error",
     "design-system/no-cross-surface-imports": "error",
     "design-system/no-deprecated": "error",

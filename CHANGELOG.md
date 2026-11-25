@@ -4,7 +4,7 @@
 
 - A `primitives` folder that does not exist is now reported instead of silently turning the primitive rules off. The same goes for a project with no folder set and no `src/design-system`.
 - `layout-only-classname` accepts `sr-only` and `not-sr-only` on a primitive.
-- Added `wrapped-libraries`, `no-duplicate-primitives`, `no-boolean-variants`, `no-theme-overrides` and `motion-tokens`.
+- Added `wrapped-libraries`, `no-duplicate-primitives`, `no-boolean-variants` and `no-theme-overrides`.
 - `recommended` now includes `no-rebuilt-primitives`, `no-duplicate-primitives` and `wrapped-libraries`.
 - `no-rebuilt-primitives` only names a primitive whose file exists, unless `elements` or `overlay` is set.
 - `no-inline-style` leaves a color to `no-raw-values`, so one line is no longer reported twice.

@@ -25,7 +25,7 @@ npm i -D oxlint outtrue
 
 Set `primitives` to the folder that holds yours. The default is `src/design-system/components`. A folder that does not exist is reported as an error.
 
-There are three configs. `base` has the three rules to start with, `recommended` adds twelve more and `all` turns on all twenty-five.
+There are three configs. `base` has the three rules to start with, `recommended` adds twelve more and `all` turns on all twenty-four.
 
 Current list of rules:
 
@@ -43,7 +43,6 @@ Current list of rules:
 - `primitive-naming`: a primitive named after a page or a variant, such as `pricing-card-pro`.
 - `no-boolean-variants`: a primitive prop such as `isPrimary` or `large` where a `variant` or `size` value belongs.
 - `no-theme-overrides`: a color set for one theme at the call site, such as `dark:bg-gray-900`.
-- `motion-tokens`: a hardcoded duration, easing or spring, such as `duration-[250ms]`.
 - `prefer-shorthand`: `w-4 h-4`, `h-screen` and an arbitrary `z-[n]`.
 - `no-template-classname`: a `className` built with a template literal.
 - `icon-button-label`: an icon-only button with no `aria-label`.

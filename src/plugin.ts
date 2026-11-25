@@ -18,7 +18,6 @@ import { preferShorthand } from "./rules/prefer-shorthand.ts";
 import { primitiveNaming } from "./rules/primitive-naming.ts";
 import { semanticTokensOnly } from "./rules/semantic-tokens-only.ts";
 import { singleExportDefault } from "./rules/single-export-default.ts";
-import { motionTokens } from "./rules/motion-tokens.ts";
 import { noBooleanVariants } from "./rules/no-boolean-variants.ts";
 import { noDuplicatePrimitives } from "./rules/no-duplicate-primitives.ts";
 import { noThemeOverrides } from "./rules/no-theme-overrides.ts";
@@ -47,7 +46,6 @@ const plugin = {
     "primitive-naming": primitiveNaming,
     "semantic-tokens-only": semanticTokensOnly,
     "single-export-default": singleExportDefault,
-    "motion-tokens": motionTokens,
     "no-boolean-variants": noBooleanVariants,
     "no-duplicate-primitives": noDuplicatePrimitives,
     "no-theme-overrides": noThemeOverrides,
