@@ -74,3 +74,31 @@ lines shaped like this:
 ```md
 - Button: runs an action. `@/design-system/components/button`
 ```
+
+## Existing codebases
+
+Record the violations you already have, so only new ones fail:
+
+```sh
+npx oxlint -f json . | npx outtrue-baseline > lint/design-system-baseline.json
+```
+
+Pass each rule its part of that file as the `baseline` option. A JSON config can't read another file, so this needs `oxlint.config.ts`, where `extends` takes the imported config:
+
+```ts
+import { defineConfig } from "oxlint";
+import recommended from "outtrue/configs/recommended.json" with { type: "json" };
+import baseline from "./lint/design-system-baseline.json" with { type: "json" };
+
+export default defineConfig({
+  extends: [recommended],
+  rules: {
+    "design-system/no-raw-values": [
+      "error",
+      { baseline: baseline["no-raw-values"] },
+    ],
+  },
+});
+```
+
+A file over its count fails and so does a file under it, so the baseline only shrinks.
