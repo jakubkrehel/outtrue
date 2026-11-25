@@ -14,6 +14,7 @@ export interface Node {
   expression?: Node;
   expressions?: Node[];
   id?: Node;
+  importKind?: string;
   init?: Node;
   key?: Node;
   left?: Node;

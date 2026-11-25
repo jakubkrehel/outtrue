@@ -25,7 +25,7 @@ npm i -D oxlint outtrue
 
 Set `primitives` to the folder that holds yours. The default is `src/design-system/components`. A folder that does not exist is reported as an error.
 
-There are three configs. `base` has the three rules to start with, `recommended` adds nine more and `all` turns on all twenty.
+There are three configs. `base` has the three rules to start with, `recommended` adds twelve more and `all` turns on all twenty-four.
 
 Current list of rules:
 
@@ -33,12 +33,16 @@ Current list of rules:
 - `layout-only-classname`: a `className` that restyles a primitive instead of placing it.
 - `one-way-imports`: an import from a level above.
 - `no-rebuilt-primitives`: a raw `<button>`, `<input>` or hand-built overlay where a primitive exists.
+- `no-duplicate-primitives`: a component file named like a primitive, such as `billing/button.tsx`.
+- `wrapped-libraries`: a library the design system wraps, such as Base UI or Radix, imported outside it.
 - `index-in-sync`: a component missing from the index or an index line whose file is gone.
 - `complete-composition`: a composable component used without a required part.
 - `closed-variants`: a `variant` or `size` prop typed as any string.
 - `semantic-tokens-only`: a raw palette class such as `text-gray-900` outside the design system.
 - `no-deprecated`: a deprecated component, prop or import path.
 - `primitive-naming`: a primitive named after a page or a variant, such as `pricing-card-pro`.
+- `no-boolean-variants`: a primitive prop such as `isPrimary` or `large` where a `variant` or `size` value belongs.
+- `no-theme-overrides`: a color set for one theme at the call site, such as `dark:bg-gray-900`.
 - `prefer-shorthand`: `w-4 h-4`, `h-screen` and an arbitrary `z-[n]`.
 - `no-template-classname`: a `className` built with a template literal.
 - `icon-button-label`: an icon-only button with no `aria-label`.

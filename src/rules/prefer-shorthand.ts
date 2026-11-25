@@ -10,7 +10,13 @@ const SCREEN_HEIGHT = /^((?:min-|max-)?h)-screen$/;
 
 const ARBITRARY_Z = /^z-\[-?\d+\]$/;
 
-function shorthandMessages(text: string) {
+interface Checks {
+  dvh: boolean;
+  square: boolean;
+  zIndex: boolean;
+}
+
+function shorthandMessages(text: string, checks: Checks) {
   const messages: string[] = [];
   const widths = new Map<string, string>();
   const heights = new Map<string, string>();
@@ -18,12 +24,12 @@ function shorthandMessages(text: string) {
     const variant = variantOf(token);
     const utility = token.slice(variant.length);
     const screen = SCREEN_HEIGHT.exec(utility);
-    if (screen) {
+    if (screen && checks.dvh) {
       messages.push(
         `${token} ignores mobile browser chrome. Use ${variant}${screen[1]}-dvh.`,
       );
     }
-    if (ARBITRARY_Z.test(utility)) {
+    if (checks.zIndex && ARBITRARY_Z.test(utility)) {
       messages.push(
         `${token} is an arbitrary z-index. Use a step on the z scale, such as ${variant}z-10.`,
       );
@@ -34,7 +40,7 @@ function shorthandMessages(text: string) {
       heights.set(`${variant}${utility.slice(2)}`, variant);
     }
   }
-  for (const [key, variant] of widths) {
+  for (const [key, variant] of checks.square ? widths : []) {
     const value = key.slice(variant.length);
     if (heights.has(key) && value !== "screen") {
       messages.push(
@@ -45,12 +51,30 @@ function shorthandMessages(text: string) {
   return messages;
 }
 
-export const preferShorthand = ratcheted<{ functions?: string[] }>(
-  { functions: { items: { type: "string" }, type: "array" } },
-  (_file, { functions = CLASS_FUNCTIONS }, report) =>
+export const preferShorthand = ratcheted<{
+  dvh?: boolean;
+  functions?: string[];
+  square?: boolean;
+  zIndex?: boolean;
+}>(
+  {
+    dvh: { type: "boolean" },
+    functions: { items: { type: "string" }, type: "array" },
+    square: { type: "boolean" },
+    zIndex: { type: "boolean" },
+  },
+  (
+    _file,
+    { dvh = true, functions = CLASS_FUNCTIONS, square = true, zIndex = true },
+    report,
+  ) =>
     classSites(functions, (strings) => {
       for (const { node, text } of strings) {
-        for (const message of shorthandMessages(text)) {
+        for (const message of shorthandMessages(text, {
+          dvh,
+          square,
+          zIndex,
+        })) {
           report({ message, node });
         }
       }

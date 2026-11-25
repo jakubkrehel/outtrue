@@ -48,3 +48,31 @@ export function missingFolder(
     ? folder
     : null;
 }
+
+const TEST_FILE = /\.(?:test|spec|stories)\.[jt]sx?$/;
+
+export function componentKey(file: string) {
+  return posix
+    .basename(file)
+    .replace(/\..+$/, "")
+    .replaceAll(/[-_]/g, "")
+    .toLowerCase();
+}
+
+const primitiveFiles = new Map<string, Map<string, string>>();
+
+export function primitivesByName(cwd: string, folders: string[]) {
+  const key = [cwd, ...folders].join("\n");
+  let names = primitiveFiles.get(key);
+  if (!names) {
+    names = new Map(
+      folders
+        .flatMap((folder) => sourceFiles(cwd, folder.replace(/\/$/, "")))
+        .filter((file) => !TEST_FILE.test(file))
+        .map((file) => [componentKey(file), file]),
+    );
+    names.delete("index");
+    primitiveFiles.set(key, names);
+  }
+  return names;
+}

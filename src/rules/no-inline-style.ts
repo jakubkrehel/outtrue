@@ -8,6 +8,9 @@ import {
 } from "../lib/ast.ts";
 import { ratcheted } from "../lib/ratchet.ts";
 
+const COLOR =
+  /^(?:#(?:[\da-f]{3,4}|[\da-f]{6}|[\da-f]{8})|(?:rgba?|hsla?|oklch|oklab|lab|lch|color)\(.+\))$/i;
+
 function fixedStyleKey(property: Node) {
   const value = valueNode(property);
   const key =
@@ -16,7 +19,8 @@ function fixedStyleKey(property: Node) {
   const fixed =
     value?.type === "Literal" &&
     (typeof value.value === "string" || typeof value.value === "number");
-  return fixed && !key.startsWith("--") ? key : "";
+  const color = typeof value?.value === "string" && COLOR.test(value.value);
+  return fixed && !color && !key.startsWith("--") ? key : "";
 }
 
 export const noInlineStyle = ratcheted<{
