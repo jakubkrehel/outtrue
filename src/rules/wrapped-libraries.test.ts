@@ -45,3 +45,19 @@ test("reads the libraries option", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(1);
 });
+
+test("tells type specifiers from value ones", () => {
+  const result = lint("wrapped-libraries", {
+    "src/app/types.tsx":
+      'import { type Dialog } from "@base-ui/react/dialog";\n\nexport type Props = Dialog.Root.Props;\n',
+    "src/app/mixed.tsx":
+      'import { Dialog, type DialogRootProps } from "@base-ui/react/dialog";\n\nexport type Props = DialogRootProps;\n\nexport const Root = Dialog.Root;\n',
+    "src/app/effect.tsx": 'import "@base-ui/react/dialog";\n',
+  });
+
+  expect(result["src/app/types.tsx"]).toHaveLength(0);
+
+  expect(result["src/app/mixed.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/effect.tsx"]).toHaveLength(1);
+});

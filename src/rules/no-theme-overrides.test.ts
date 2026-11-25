@@ -32,3 +32,21 @@ test("lets the design system set theme colors", () => {
 
   expect(result["src/design-system/components/button.tsx"]).toHaveLength(0);
 });
+
+test("accepts background and arbitrary classes that are not colors", () => {
+  const result = lint("no-theme-overrides", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <div className="dark:bg-cover dark:bg-no-repeat dark:bg-center dark:bg-left-top dark:bg-fixed dark:bg-[url(/dark.png)] dark:bg-linear-to-r dark:text-[13px] dark:border-x dark:border-t-2 dark:divide-x-2 dark:divide-y-reverse dark:ring-offset-2 dark:outline-offset-2 dark:border-spacing-2 dark:text-shadow-sm dark:to-50%" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});
+
+test("reports a color on a side or an offset", () => {
+  const result = lint("no-theme-overrides", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <div className="dark:border-t-red-500 dark:ring-offset-red-500 dark:border-x-border dark:bg-[#111] dark:text-[color:var(--ink)] dark:inset-ring-white/10" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(6);
+});

@@ -9,10 +9,42 @@ import {
 import { isUnder } from "../lib/paths.ts";
 import { ratcheted, type Visitor } from "../lib/ratchet.ts";
 
-const COLOR_UTILITY = new RegExp(`^(?:${COLOR_ROOTS})-(.+)$`);
+const ROOTS = COLOR_ROOTS.split("|")
+  .toSorted((a, b) => b.length - a.length)
+  .join("|");
 
-const NOT_A_COLOR =
-  /^(?:\d[\d./%]*|\[(?:length:)?-?[\d.]+(?:px|rem|em|%)?\]|[2-9]?x[sl]|xs|sm|md|lg|base|none|hidden|inner|inset|auto|[xytrblse](?:-.+)?|left|center|right|justify|start|end|wrap|nowrap|balance|pretty|ellipsis|clip|solid|dashed|dotted|double|wavy|collapse|separate|from-font|offset-.+|(?:linear|radial|conic)(?:-.+)?)$/;
+const COLOR_UTILITY = new RegExp(`^(${ROOTS})-(.+)$`);
+
+const ARBITRARY_COLOR =
+  /^\[(?:color:|#|(?:rgba?|hsla?|oklch|oklab|lab|lch|color)\()/;
+
+const SIDE = "left|right|top|bottom|center";
+
+const NOT_A_COLOR = new RegExp(
+  `^(?:${[
+    String.raw`\d[\d./%]*`,
+    String.raw`\(.+\)`,
+    "[2-9]?x[sl]|xs|sm|md|lg|base|px",
+    "none|hidden|inner|inset|auto|clone|slice",
+    "[xytrblse]",
+    String.raw`[xy]-(?:\d.*|px|reverse)`,
+    String.raw`offset-\d.*`,
+    "spacing-.+",
+    `${SIDE}|(?:${SIDE})-(?:${SIDE})`,
+    "justify|start|end|wrap|nowrap|balance|pretty|ellipsis|clip",
+    "solid|dashed|dotted|double|wavy|collapse|separate|from-font",
+    "shadow-(?:none|[2-9]?x[sl]|xs|sm|md|lg)",
+    "cover|contain|fixed|local|scroll|no-repeat|repeat(?:-.+)?",
+    "(?:clip|origin|blend|size|position)-.+",
+    "(?:linear|radial|conic|gradient)(?:-.+)?",
+  ].join("|")})$`,
+);
+
+function isColor(value: string) {
+  return value.startsWith("[")
+    ? ARBITRARY_COLOR.test(value)
+    : !NOT_A_COLOR.test(value);
+}
 
 export const noThemeOverrides = ratcheted<{
   functions?: string[];
@@ -42,8 +74,8 @@ export const noThemeOverrides = ratcheted<{
           const theme = variantOf(token)
             .split(":")
             .find((variant) => variants.includes(variant));
-          const value = COLOR_UTILITY.exec(utilityOf(token))?.[1];
-          if (theme && value && !NOT_A_COLOR.test(value)) {
+          const value = COLOR_UTILITY.exec(utilityOf(token))?.[2];
+          if (theme && value && isColor(value)) {
             report({
               message: `${token} sets a color for the ${theme} theme at the call site. Use a token that changes with the theme, or add one.`,
               node,

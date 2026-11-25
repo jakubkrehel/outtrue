@@ -31,7 +31,12 @@ export const wrappedLibraries = ratcheted<{
     }
     const visit = (node: Node) => {
       const source = node.source?.value;
-      if (typeof source !== "string" || node.importKind === "type") {
+      const specifiers = node.specifiers ?? [];
+      const typeOnly =
+        node.importKind === "type" ||
+        (specifiers.length > 0 &&
+          specifiers.every((specifier) => specifier.importKind === "type"));
+      if (typeof source !== "string" || typeOnly) {
         return;
       }
       const library = libraries.find(
