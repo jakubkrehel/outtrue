@@ -35,3 +35,16 @@ test("accepts an import from a shared surface", () => {
 
   expect(result["src/components/article/layout.tsx"]).toHaveLength(0);
 });
+
+test("accepts an import from the primitives when they sit beside the surfaces", () => {
+  const result = lint(
+    "no-cross-surface-imports",
+    {
+      "src/components/billing/plan.tsx":
+        'import { Button } from "@/components/ui/button";\nexport default function Fixture() {\n  return (\n    <Button />\n  );\n}\n',
+    },
+    { primitives: "src/components/ui" },
+  );
+
+  expect(result["src/components/billing/plan.tsx"]).toHaveLength(0);
+});

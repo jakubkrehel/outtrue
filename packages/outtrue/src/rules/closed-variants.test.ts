@@ -14,3 +14,17 @@ test("reports an open variant prop", () => {
     result["src/design-system/components/badge.tsx"]?.join("\n"),
   ).toContain("variant accepts any string or number");
 });
+
+test("reads the primitives folder from the shared setting", () => {
+  const result = lint(
+    "closed-variants",
+    {
+      "src/components/ui/button.tsx":
+        "interface Props {\n  variant?: string;\n}\nexport default function Fixture(_props: Props) {\n  return null;\n}\n",
+    },
+    undefined,
+    { primitives: "src/components/ui" },
+  );
+
+  expect(result["src/components/ui/button.tsx"]).toHaveLength(1);
+});

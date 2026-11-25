@@ -29,27 +29,29 @@ const LAYOUT_ROOTS = [
 ].join("|");
 
 const ARRANGEMENT =
-  "(?:inline-)?flex|flex-(?:row|col)(?:-reverse)?|(?:gap|gap-x|gap-y|items|justify|translate|translate-x|translate-y|scroll-m[xytrblse]?)-.+";
+  "(?:inline-)?(?:flex|grid)|flex-(?:row|col)(?:-reverse)?|flex-(?:no)?wrap(?:-reverse)?|(?:gap|gap-x|gap-y|items|justify|justify-items|content|place-items|place-content|grid-cols|grid-rows|grid-flow|auto-cols|auto-rows|space-x|space-y|aspect|translate|translate-x|translate-y|scroll-m[xytrblse]?)-.+";
 
 const LAYOUT = new RegExp(
   `^(?:(?:${LAYOUT_ROOTS})-.+|flex-(?:1|auto|none|initial)|grow|shrink|absolute|relative|fixed|sticky|static|hidden|block|inline-block|(?:group|peer)(?:/.+)?|${ARRANGEMENT})$`,
 );
 
 export const layoutOnlyClassName = ratcheted<{
+  alias?: Record<string, string>;
   allow?: string[];
   primitives?: string[];
 }>(
   {
+    alias: { additionalProperties: { type: "string" }, type: "object" },
     allow: { items: { type: "string" }, type: "array" },
     primitives: { items: { type: "string" }, type: "array" },
   },
   (
-    _file,
-    { allow = [], primitives = ["@/design-system/components/"] },
+    file,
+    { alias, allow = [], primitives = ["@/design-system/components/"] },
     report,
   ) => {
     const allowed = allow.map((pattern) => new RegExp(pattern));
-    const { collect, sources } = primitiveImports(primitives);
+    const { collect, sources } = primitiveImports(primitives, file, alias);
     return {
       ImportDeclaration: collect,
       JSXOpeningElement(node: Node) {
@@ -76,7 +78,7 @@ export const layoutOnlyClassName = ratcheted<{
           restyles.length > 3 ? ` and ${restyles.length - 3} more` : "";
         const verb = restyles.length === 1 ? "restyles" : "restyle";
         report({
-          message: `className on <${elementName(element)}> can only place it: margin, size, position and flex or grid placement. ${listed}${rest} ${verb} the component. Use a prop, or add a variant in ${source}.`,
+          message: `className on <${elementName(element)}> can only place it or arrange its children: margin, size, position and flex or grid layout. ${listed}${rest} ${verb} the component. Use a prop, or add a variant in ${source}.`,
           node: attribute,
         });
       },

@@ -200,15 +200,31 @@ export function classSites(
   };
 }
 
-export function primitiveImports(prefixes: string[]) {
+export const ALIAS = { "@/": "src/" };
+
+export function primitiveImports(
+  prefixes: string[],
+  file: string,
+  alias: Record<string, string> = ALIAS,
+) {
   const sources = new Map<string, string>();
+  const folders = prefixes.map((prefix) =>
+    (resolveImport(file, prefix, alias) ?? prefix).replace(/\/$/, ""),
+  );
+  const isPrimitive = (source: string) => {
+    if (prefixes.some((prefix) => source.startsWith(prefix))) {
+      return true;
+    }
+    const target = resolveImport(file, source, alias);
+    return (
+      target !== null &&
+      folders.some((folder) => target.startsWith(`${folder}/`))
+    );
+  };
   return {
     collect(node: Node) {
       const source = node.source?.value;
-      if (
-        typeof source !== "string" ||
-        !prefixes.some((prefix) => source.startsWith(prefix))
-      ) {
+      if (typeof source !== "string" || !isPrimitive(source)) {
         return;
       }
       for (const specifier of node.specifiers ?? []) {

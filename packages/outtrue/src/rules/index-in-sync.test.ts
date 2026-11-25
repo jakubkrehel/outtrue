@@ -24,3 +24,18 @@ test("reports a missing component and a stale line", () => {
     "card has no line in src/design-system/INDEX.md",
   );
 });
+
+test("finds a bold label and a name cased differently from its file", () => {
+  const result = lint("index-in-sync", {
+    "src/design-system/INDEX.md":
+      "- **Card**: groups content.\n- InputOTP: a one-time code.\n",
+    "src/design-system/components/card.tsx":
+      "export default function Fixture() {\n  return (\n    <div />\n  );\n}\n",
+    "src/design-system/components/input-otp.tsx":
+      "export default function Fixture() {\n  return (\n    <div />\n  );\n}\n",
+  });
+
+  expect(result["src/design-system/components/card.tsx"]).toHaveLength(0);
+
+  expect(result["src/design-system/components/input-otp.tsx"]).toHaveLength(0);
+});

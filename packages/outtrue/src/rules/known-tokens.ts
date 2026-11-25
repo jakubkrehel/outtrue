@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
 import {
   CLASS_FUNCTIONS,
   classSites,
@@ -26,28 +26,45 @@ const DEFAULT_STEPS = [
 
 const THEME_COLOR = /--color-([a-z][a-z-]*?)-(\d{1,4})\s*:/g;
 
+const RELATIVE_IMPORT = /@import\s+(?:url\()?["'](\.[^"']+\.css)["']/g;
+
 const themes = new Map<string, Map<string, Set<string>>>();
 
+function stylesheets(paths: string[], seen = new Map<string, string>()) {
+  for (const path of paths) {
+    if (seen.has(path) || !existsSync(path)) {
+      continue;
+    }
+    const css = readFileSync(path, "utf8");
+    seen.set(path, css);
+    stylesheets(
+      [...css.matchAll(RELATIVE_IMPORT)].map(([, source = ""]) =>
+        join(dirname(path), source),
+      ),
+      seen,
+    );
+  }
+  return seen;
+}
+
 function themeScales(cwd: string, files: string[], defaults: boolean) {
-  const key = `${cwd}\n${files.join("\n")}\n${defaults}`;
+  const sheets = stylesheets(files.map((file) => join(cwd, file)));
+  const key = [
+    defaults,
+    ...[...sheets.keys()].map((path) => `${path}:${statSync(path).mtimeMs}`),
+  ].join("\n");
   const cached = themes.get(key);
   if (cached) {
     return cached;
   }
   const scales = new Map<string, Set<string>>();
-  if (defaults) {
+  if (defaults && sheets.size > 0) {
     for (const scale of PALETTE) {
       scales.set(scale, new Set(DEFAULT_STEPS));
     }
   }
-  for (const file of files) {
-    const path = join(cwd, file);
-    if (!existsSync(path)) {
-      continue;
-    }
-    for (const [, scale = "", step = ""] of readFileSync(path, "utf8").matchAll(
-      THEME_COLOR,
-    )) {
+  for (const css of sheets.values()) {
+    for (const [, scale = "", step = ""] of css.matchAll(THEME_COLOR)) {
       scales.set(scale, (scales.get(scale) ?? new Set()).add(step));
     }
   }

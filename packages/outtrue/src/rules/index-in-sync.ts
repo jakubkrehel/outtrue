@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, posix } from "node:path";
 import { type Node } from "../lib/ast.ts";
 import { isUnder, SOURCE_FILE, sourceFiles } from "../lib/paths.ts";
@@ -15,28 +15,25 @@ function pascalCase(name: string) {
 function mentions(text: string, name: string) {
   const escaped = name.replaceAll(/[$()*+.?[\\\]^{|}]/g, "\\$&");
   return new RegExp(
-    `^\\s*[-*]\\s+${escaped}[^\\w-]|\`(?:[\\w@.-]+/)*${escaped}(?:\\.[jt]sx?)?\``,
-    "m",
+    `^\\s*[-*]\\s+(?:\\*\\*|__)?${escaped}[^\\w-]|\`(?:[\\w@.-]+/)*${escaped}(?:\\.[jt]sx?)?\``,
+    "im",
   ).test(text);
 }
 
-const INDEX_ENTRY = /^\s*[-*]\s+[\w<][^:`]*:\s.*`([\w@./-]+)`\s*$/;
+const INDEX_ENTRY = /^\s*[-*]\s+[\w<*][^:`]*:\s.*`([\w@./-]+)`\s*$/;
 
-const indexes = new Map<string, { files: string[]; text: string | null }>();
+const indexes = new Map<string, string>();
 
 function readIndex(cwd: string, index: string, primitives: string[]) {
-  const key = `${cwd}\n${index}\n${primitives.join("\n")}`;
-  const cached = indexes.get(key);
-  if (cached) {
-    return cached;
-  }
   const path = join(cwd, index);
-  const read = {
-    files: primitives.flatMap((folder) => sourceFiles(cwd, folder)),
-    text: existsSync(path) ? readFileSync(path, "utf8") : null,
-  };
-  indexes.set(key, read);
-  return read;
+  const files = primitives.flatMap((folder) => sourceFiles(cwd, folder));
+  if (!existsSync(path)) {
+    return { files, text: null };
+  }
+  const key = `${path}:${statSync(path).mtimeMs}`;
+  const text = indexes.get(key) ?? readFileSync(path, "utf8");
+  indexes.set(key, text);
+  return { files, text };
 }
 
 export const indexInSync = ratcheted<{
@@ -87,7 +84,7 @@ export const indexInSync = ratcheted<{
         const base = posix.basename(stem);
         if (!(mentions(text, base) || mentions(text, pascalCase(base)))) {
           report({
-            message: `${base} has no line in ${index}. Add one with what it is for and its import path.`,
+            message: `${base} has no line in ${index}. Add a line that names it and says what it is for.`,
             node: program,
           });
         }

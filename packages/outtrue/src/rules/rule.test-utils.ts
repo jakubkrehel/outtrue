@@ -20,6 +20,7 @@ export function lint(
   rule: string,
   files: Record<string, string>,
   options?: Record<string, unknown>,
+  settings?: Record<string, unknown>,
 ) {
   const directory = mkdtempSync(join(tmpdir(), "outtrue-"));
 
@@ -40,6 +41,7 @@ export function lint(
         rules: {
           [`design-system/${rule}`]: options ? ["error", options] : "error",
         },
+        settings: settings ? { "design-system": settings } : undefined,
       }),
     );
 

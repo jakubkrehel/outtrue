@@ -26,10 +26,12 @@ function isChildrenExpression(node: Node | undefined) {
 }
 
 export const completeComposition = ratcheted<{
+  alias?: Record<string, string>;
   parts?: Record<string, Part[]>;
   primitives?: string[];
 }>(
   {
+    alias: { additionalProperties: { type: "string" }, type: "object" },
     primitives: { items: { type: "string" }, type: "array" },
     parts: {
       additionalProperties: {
@@ -45,12 +47,12 @@ export const completeComposition = ratcheted<{
     },
   },
   (
-    _file,
-    { parts = {}, primitives = ["@/design-system/components/"] },
+    file,
+    { alias, parts = {}, primitives = ["@/design-system/components/"] },
     report,
   ) => {
     const open: Composition[] = [];
-    const { collect, sources } = primitiveImports(primitives);
+    const { collect, sources } = primitiveImports(primitives, file, alias);
     return {
       ImportDeclaration: collect,
       JSXElement(node: Node) {

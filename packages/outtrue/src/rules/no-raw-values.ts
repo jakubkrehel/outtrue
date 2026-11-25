@@ -18,7 +18,12 @@ const COLOR =
 
 const LENGTH = /^(-?\d*\.?\d+)(px|rem)$/;
 
+const COLOR_INSIDE =
+  /(?<!url\()#(?:[\da-f]{8}|[\da-f]{6}|[\da-f]{3,4})(?![\w-])|(?:rgba?|hsla?|oklch|oklab|lab|lch)\(/i;
+
 const ARBITRARY = /^([a-z][a-z\d-]*)-\[(.+)\](\/.+)?$/;
+
+const ARBITRARY_PROPERTY = /^\[[a-z][a-z-]*:(.+)\]$/;
 
 const SPACING_ROOTS = new Set([
   ...PLACEMENT_ROOTS,
@@ -42,18 +47,20 @@ const SPACING_ROOTS = new Set([
 ]);
 
 function rawValueMessage(token: string, spacing: number) {
-  const match = ARBITRARY.exec(utilityOf(token));
-  if (!match) {
+  const utility = utilityOf(token);
+  const property = ARBITRARY_PROPERTY.exec(utility)?.[1];
+  const match = ARBITRARY.exec(utility);
+  if (!(match || property)) {
     return null;
   }
-  const [, root = "", value = ""] = match;
+  const [, root = "", value = property ?? ""] = match ?? [];
   if (value.includes("var(") || value.startsWith("--")) {
     return null;
   }
-  if (COLOR.test(value)) {
-    return `${token} hardcodes a colour. Use a colour token, or add one to the theme.`;
+  if (COLOR.test(value) || COLOR_INSIDE.test(value)) {
+    return `${token} hardcodes a color. Use a color token, or add one to the theme.`;
   }
-  const length = LENGTH.exec(value);
+  const length = property ? null : LENGTH.exec(value);
   if (!length) {
     return null;
   }
@@ -61,7 +68,8 @@ function rawValueMessage(token: string, spacing: number) {
   const pixels = Number(amount) * (unit === "rem" ? 16 : 1);
   const step = pixels / spacing;
   if (SPACING_ROOTS.has(root) && Number.isInteger(step * 4)) {
-    return `${token} hardcodes a length. ${value} is ${token.replace(`[${value}]`, String(step))} on the spacing scale.`;
+    const name = pixels === 1 ? "px" : String(step);
+    return `${token} hardcodes a length. ${value} is ${token.replace(`[${value}]`, name)} on the spacing scale.`;
   }
   return `${token} hardcodes a length. Use a step from the scale, or add a token to the theme.`;
 }
@@ -113,7 +121,7 @@ export const noRawValues = ratcheted<{
         COLOR.test(node.value)
       ) {
         report({
-          message: `${node.value} is a hardcoded colour. Use a colour token: a class, currentColor or a CSS variable.`,
+          message: `${node.value} is a hardcoded color. Use a color token: a class, currentColor or a CSS variable.`,
           node,
         });
       }

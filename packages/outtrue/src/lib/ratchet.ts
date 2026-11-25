@@ -10,6 +10,7 @@ export interface Context {
   cwd: string;
   filename: string;
   options: unknown[];
+  settings?: Record<string, unknown>;
   report: (descriptor: Report) => void;
 }
 
@@ -18,6 +19,22 @@ export function relativePath(context: Context) {
 }
 
 export type Visitor = Record<string, (node: Node) => void>;
+
+function sharedPrimitives(
+  context: Context,
+  properties: Record<string, unknown>,
+) {
+  const shared = context.settings?.["design-system"] as
+    | { primitives?: string | string[] }
+    | undefined;
+  if (!(shared?.primitives && "primitives" in properties)) {
+    return {};
+  }
+  const folders = [shared.primitives].flat();
+  const takesOne =
+    (properties["primitives"] as { type?: string }).type === "string";
+  return { primitives: takesOne ? folders[0] : folders };
+}
 
 export function ratcheted<Options>(
   properties: Record<string, unknown>,
@@ -30,9 +47,10 @@ export function ratcheted<Options>(
 ) {
   return {
     create(context: Context): Visitor {
-      const { baseline = {}, ...options } = (context.options[0] ?? {}) as {
-        baseline?: Record<string, number>;
-      } & Options;
+      const { baseline = {}, ...options } = {
+        ...sharedPrimitives(context, properties),
+        ...(context.options[0] as object | undefined),
+      } as { baseline?: Record<string, number> } & Options;
       const file = relativePath(context);
       const allowance = baseline[file] ?? 0;
       const reports: Report[] = [];

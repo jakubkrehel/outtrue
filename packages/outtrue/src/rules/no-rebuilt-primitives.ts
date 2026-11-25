@@ -33,6 +33,8 @@ export const noRebuiltPrimitives = ratcheted<{
         "input[type=checkbox]": "Checkbox",
         "input[type=file]": "",
         "input[type=hidden]": "",
+        "input[type=radio]": "Radio",
+        "input[type=range]": "Slider",
         textarea: "Textarea",
       },
       overlay = "Dialog",

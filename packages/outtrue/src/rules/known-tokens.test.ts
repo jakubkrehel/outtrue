@@ -20,3 +20,29 @@ test("reports a step the theme does not define", () => {
     "bg-gray-150 names a step",
   );
 });
+
+test("reads tokens from a stylesheet the theme imports", () => {
+  const result = lint("known-tokens", {
+    "src/app/globals.css":
+      '@import "tailwindcss";\n@import "../styles/tokens.css";\n',
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <div className="bg-gray-13 text-gray-12" />\n  );\n}\n',
+    "src/styles/tokens.css": "@theme {\n  --color-gray-12: #202020;\n}\n",
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain(
+    "bg-gray-13 names a step",
+  );
+});
+
+test("reports nothing when no theme file is found", () => {
+  const result = lint("known-tokens", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <div className="text-gray-12" />\n  );\n}\n',
+    "src/styles/tokens.css": "@theme {\n  --color-gray-12: #202020;\n}\n",
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});

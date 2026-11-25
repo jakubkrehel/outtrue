@@ -16,7 +16,16 @@ pnpm add -D oxlint outtrue
 }
 ```
 
-There are three configs. `base` has the three rules to start with, `recommended` adds the ones that need no setup and `all` turns on everything.
+There are three configs. `base` has the three rules to start with, `recommended` adds the ones that only need to know where your primitives are and `all` turns on everything.
+
+The rules look for primitives in `src/design-system/components`. If yours live somewhere else, say where once. Without it the rules that check primitives report nothing:
+
+```json
+{
+  "extends": ["./node_modules/outtrue/configs/recommended.json"],
+  "settings": { "design-system": { "primitives": "src/components/ui" } }
+}
+```
 
 The class rules read Tailwind class names. Requires Oxlint 1.92 or later.
 
@@ -53,7 +62,25 @@ Record the violations you already have, so only new ones fail:
 pnpm exec oxlint -f json . | pnpm exec outtrue-baseline > lint/design-system-baseline.json
 ```
 
-Pass each rule its part of that file as the `baseline` option. A file over its count fails and so does a file under it, so the baseline only shrinks.
+Pass each rule its part of that file as the `baseline` option. A JSON config can't read another file, so this needs `oxlint.config.ts`, where `extends` takes the imported config:
+
+```ts
+import { defineConfig } from "oxlint";
+import recommended from "outtrue/configs/recommended.json" with { type: "json" };
+import baseline from "./lint/design-system-baseline.json" with { type: "json" };
+
+export default defineConfig({
+  extends: [recommended],
+  rules: {
+    "design-system/no-raw-values": [
+      "error",
+      { baseline: baseline["no-raw-values"] },
+    ],
+  },
+});
+```
+
+A file over its count fails and so does a file under it, so the baseline only shrinks.
 
 ## License
 

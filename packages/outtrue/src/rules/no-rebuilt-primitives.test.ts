@@ -25,3 +25,12 @@ test("leaves the design system itself alone", () => {
 
   expect(result["src/design-system/components/button.tsx"]).toHaveLength(0);
 });
+
+test("names the primitive for a radio input", () => {
+  const result = lint("no-rebuilt-primitives", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <input type="radio" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain("Use Radio.");
+});

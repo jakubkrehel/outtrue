@@ -16,10 +16,16 @@ import { ratcheted } from "../lib/ratchet.ts";
 
 const REACH_IN = /(?:^|:)(?:\[[^\]]*&[^\]]*\]|\*{1,2}):/;
 
-export const noReachInSelectors = ratcheted<{ primitives?: string[] }>(
-  { primitives: { items: { type: "string" }, type: "array" } },
-  (_file, { primitives = ["@/design-system/components/"] }, report) => {
-    const { collect, sources } = primitiveImports(primitives);
+export const noReachInSelectors = ratcheted<{
+  alias?: Record<string, string>;
+  primitives?: string[];
+}>(
+  {
+    alias: { additionalProperties: { type: "string" }, type: "object" },
+    primitives: { items: { type: "string" }, type: "array" },
+  },
+  (file, { alias, primitives = ["@/design-system/components/"] }, report) => {
+    const { collect, sources } = primitiveImports(primitives, file, alias);
     return {
       ImportDeclaration: collect,
       JSXOpeningElement(node: Node) {

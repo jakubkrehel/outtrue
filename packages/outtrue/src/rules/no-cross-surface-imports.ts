@@ -24,6 +24,9 @@ export const noCrossSurfaceImports = ratcheted<{
     report,
   ) => {
     const surfaceOf = (path: string) => {
+      if (path === primitives || path.startsWith(`${primitives}/`)) {
+        return null;
+      }
       for (const folder of surfaces) {
         if (path.startsWith(`${folder}/`)) {
           const [surface = "", ...rest] = path

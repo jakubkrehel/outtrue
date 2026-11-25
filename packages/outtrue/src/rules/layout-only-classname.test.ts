@@ -47,3 +47,35 @@ test("accepts classes that arrange children or offset the component", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(0);
 });
+
+test("accepts grid layout the same as flex", () => {
+  const result = lint("layout-only-classname", {
+    "src/app/page.tsx":
+      'import Card from "@/design-system/components/card";\nexport default function Fixture() {\n  return (\n    <Card className="grid aspect-square grid-cols-2 flex-wrap place-items-center gap-4" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});
+
+test("checks a primitive imported by a relative path", () => {
+  const result = lint("layout-only-classname", {
+    "src/app/page.tsx":
+      'import Card from "../design-system/components/card";\nexport default function Fixture() {\n  return (\n    <Card className="bg-red-500" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+});
+
+test("reads the primitives folder from the shared setting", () => {
+  const result = lint(
+    "layout-only-classname",
+    {
+      "src/app/page.tsx":
+        'import { Button } from "@/components/ui/button";\nexport default function Fixture() {\n  return (\n    <Button className="bg-red-500">Save</Button>\n  );\n}\n',
+    },
+    undefined,
+    { primitives: "src/components/ui" },
+  );
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+});
