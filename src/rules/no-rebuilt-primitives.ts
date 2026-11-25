@@ -11,8 +11,21 @@ import {
   tokensOf,
   utilityOf,
 } from "../lib/classes.ts";
-import { isUnder } from "../lib/paths.ts";
+import { isUnder, primitivesByName } from "../lib/paths.ts";
 import { ratcheted, type Visitor } from "../lib/ratchet.ts";
+
+const ELEMENTS: Record<string, string> = {
+  button: "Button",
+  input: "Input",
+  "input[type=checkbox]": "Checkbox",
+  "input[type=file]": "",
+  "input[type=hidden]": "",
+  "input[type=radio]": "Radio",
+  "input[type=range]": "Slider",
+  textarea: "Textarea",
+};
+
+const OVERLAY = "Dialog";
 
 export const noRebuiltPrimitives = ratcheted<{
   elements?: Record<string, string>;
@@ -26,25 +39,22 @@ export const noRebuiltPrimitives = ratcheted<{
   },
   (
     file,
-    {
-      elements = {
-        button: "Button",
-        input: "Input",
-        "input[type=checkbox]": "Checkbox",
-        "input[type=file]": "",
-        "input[type=hidden]": "",
-        "input[type=radio]": "Radio",
-        "input[type=range]": "Slider",
-        textarea: "Textarea",
-      },
-      overlay = "Dialog",
-      primitives = ["src/design-system"],
-    },
+    { elements, overlay, primitives = ["src/design-system"] },
     report,
+    cwd,
   ): Visitor => {
     if (isUnder(file, primitives)) {
       return {};
     }
+    const existing = primitivesByName(cwd, primitives);
+    const exists = (component: string) =>
+      component === "" || existing.has(component.toLowerCase());
+    const replacements =
+      elements ??
+      Object.fromEntries(
+        Object.entries(ELEMENTS).filter(([, component]) => exists(component)),
+      );
+    const layer = overlay ?? (exists(OVERLAY) ? OVERLAY : "");
     return {
       JSXOpeningElement(node: Node) {
         const tag = nameOf(elementOf(node));
@@ -53,8 +63,8 @@ export const noRebuiltPrimitives = ratcheted<{
         }
         const type = stringAttribute(node, "type");
         const replacement =
-          (type === null ? undefined : elements[`${tag}[type=${type}]`]) ??
-          elements[tag];
+          (type === null ? undefined : replacements[`${tag}[type=${type}]`]) ??
+          replacements[tag];
         if (replacement) {
           report({
             message: `<${tag}> rebuilds a primitive the design system already has. Use ${replacement}.`,
@@ -62,7 +72,7 @@ export const noRebuiltPrimitives = ratcheted<{
           });
         }
         const attribute = classAttribute(node);
-        if (!(overlay && attribute)) {
+        if (!(layer && attribute)) {
           return;
         }
         const utilities = new Set(
@@ -72,7 +82,7 @@ export const noRebuiltPrimitives = ratcheted<{
         );
         if (utilities.has("fixed") && utilities.has("inset-0")) {
           report({
-            message: `fixed inset-0 on <${tag}> builds an overlay by hand. Use ${overlay}.`,
+            message: `fixed inset-0 on <${tag}> builds an overlay by hand. Use ${layer}.`,
             node: attribute,
           });
         }

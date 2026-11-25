@@ -22,3 +22,12 @@ test("reports fixed values and leaves computed ones", () => {
 
   expect(result["src/app/image.tsx"]).toHaveLength(0);
 });
+
+test("leaves a color to no-raw-values", () => {
+  const result = lint("no-inline-style", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return <div style={{ color: "#fff", background: "oklch(0.7 0.1 250)" }} />;\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(0);
+});

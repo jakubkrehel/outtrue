@@ -25,3 +25,18 @@ test("accepts the shorthands", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(0);
 });
+
+test("turns each check off on its own", () => {
+  const result = lint(
+    "prefer-shorthand",
+    {
+      "src/app/page.tsx":
+        'export default function Fixture() {\n  return (\n    <span className="h-4 w-4 h-screen z-[999]" />\n  );\n}\n',
+    },
+    { dvh: false, zIndex: false },
+  );
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain("Use size-4");
+});

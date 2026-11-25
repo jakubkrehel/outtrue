@@ -20,3 +20,18 @@ test("reports a primitive named after a page or a variant", () => {
 
   expect(result["src/design-system/components/card.tsx"]).toHaveLength(0);
 });
+
+test("accepts names that only sound like a page or a tier", () => {
+  const result = lint("primitive-naming", {
+    "src/design-system/components/settings-menu.tsx":
+      "export default function Fixture() {\n  return (\n    <div />\n  );\n}\n",
+    "src/design-system/components/new-badge.tsx":
+      "export default function Fixture() {\n  return (\n    <div />\n  );\n}\n",
+  });
+
+  expect(result["src/design-system/components/settings-menu.tsx"]).toHaveLength(
+    0,
+  );
+
+  expect(result["src/design-system/components/new-badge.tsx"]).toHaveLength(0);
+});
