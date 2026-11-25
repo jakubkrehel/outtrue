@@ -50,7 +50,7 @@ Current list of rules:
 - `no-inline-style`: a fixed value in a `style` object.
 - `single-export-default`: a lone component not written as `export default function`.
 
-Every rule has options for your folders, names and exceptions. They are in [OPTIONS.md](packages/outtrue/OPTIONS.md), along with how to adopt the rules in a codebase that already breaks them.
+Every rule has options for your folders, names and exceptions. They are in [OPTIONS.md](OPTIONS.md), along with how to adopt the rules in a codebase that already breaks them.
 
 ## License
 

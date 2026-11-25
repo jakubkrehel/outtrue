@@ -1,26 +1,67 @@
 {
-  "name": "outtrue-monorepo",
-  "private": true,
-  "workspaces": [
-    "packages/*"
+  "name": "outtrue",
+  "version": "0.1.2",
+  "description": "Oxlint rules that keep code on the design system: tokens, props, imports and composition.",
+  "keywords": [
+    "agents",
+    "ai",
+    "design-system",
+    "lint",
+    "oxlint",
+    "oxlint-plugin",
+    "tailwind"
+  ],
+  "homepage": "https://github.com/jakubkrehel/outtrue#readme",
+  "bugs": "https://github.com/jakubkrehel/outtrue/issues",
+  "license": "MIT",
+  "author": "Jakub Krehel",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakubkrehel/outtrue.git"
+  },
+  "bin": {
+    "outtrue-baseline": "baseline.mjs"
+  },
+  "files": [
+    "dist",
+    "configs",
+    "baseline.mjs",
+    "OPTIONS.md"
   ],
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/plugin.d.mts",
+      "default": "./dist/plugin.mjs"
+    },
+    "./configs/*.json": "./configs/*.json",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "typecheck": "turbo run typecheck",
-    "lint": "oxlint",
+    "build": "tsdown",
+    "clean": "git clean -xdf .cache dist node_modules",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "changeset": "changeset",
-    "version": "changeset version"
+    "lint": "oxlint",
+    "test": "vitest run",
+    "typecheck": "tsc"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "1.0.1",
-    "@changesets/cli": "3.0.3",
+    "@types/node": "26.6.6",
     "oxfmt": "0.80.0",
     "oxlint": "1.92.0",
-    "turbo": "2.11.13"
+    "tsdown": "0.23.7",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  },
+  "peerDependencies": {
+    "oxlint": ">=1.92.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   },
   "packageManager": "bun@1.3.13"
 }
