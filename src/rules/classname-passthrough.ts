@@ -1,4 +1,4 @@
-import { nameOf, type Node } from "../lib/ast.ts";
+import { nameOf, type Node, valueNode } from "../lib/ast.ts";
 import { isUnder } from "../lib/paths.ts";
 import { ratcheted, type Visitor } from "../lib/ratchet.ts";
 
@@ -8,15 +8,24 @@ const FUNCTIONS = [
   "FunctionExpression",
 ];
 
+function isPatternProperty(node: Node | undefined) {
+  return node?.type === "Property" && node.parent?.type === "ObjectPattern";
+}
+
 export const classNamePassthrough = ratcheted<{ primitives?: string[] }>(
   { primitives: { items: { type: "string" }, type: "array" } },
   (file, { primitives = ["src/design-system"] }, report): Visitor => {
     if (!isUnder(file, primitives)) {
       return {};
     }
-    const open: { declared: boolean; node: Node; used: boolean }[] = [];
+    const open: {
+      declared: boolean;
+      local: string;
+      node: Node;
+      used: boolean;
+    }[] = [];
     const enter = (node: Node) => {
-      open.push({ declared: false, node, used: false });
+      open.push({ declared: false, local: "className", node, used: false });
     };
     const exit = (node: Node) => {
       const frame = open.pop();
@@ -36,25 +45,38 @@ export const classNamePassthrough = ratcheted<{ primitives?: string[] }>(
         ]),
       ),
       Identifier(node: Node) {
-        if (nameOf(node) !== "className") {
-          return;
-        }
+        const name = nameOf(node);
         const { parent } = node;
         if (parent?.type === "TSPropertySignature") {
           return;
         }
-        if (
-          parent?.type === "Property" &&
-          parent.parent?.type === "ObjectPattern"
-        ) {
+        const binds =
+          isPatternProperty(parent) ||
+          (parent?.type === "AssignmentPattern" &&
+            parent.left === node &&
+            isPatternProperty(parent.parent));
+        if (name === "className" && isPatternProperty(parent)) {
           const frame = open.at(-1);
-          if (frame) {
+          const target = valueNode(parent);
+          const local = nameOf(
+            target?.type === "AssignmentPattern" ? target.left : target,
+          );
+          if (frame && parent?.key === node) {
             frame.declared = true;
+            frame.local = local ?? "className";
           }
           return;
         }
+        if (binds) {
+          return;
+        }
         for (const frame of open) {
-          frame.used = true;
+          if (
+            name === "className" ||
+            (frame.declared && frame.local === name)
+          ) {
+            frame.used = true;
+          }
         }
       },
     };

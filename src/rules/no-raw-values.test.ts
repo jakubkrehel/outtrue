@@ -78,3 +78,12 @@ test("reads classes inside cva and constants", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(2);
 });
+
+test("reads a number sign as text unless the attribute paints", () => {
+  const result = lint("no-raw-values", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <svg data-issue="#120" id="#4821">\n      <rect fill="#120" />\n      <rect data-tone="#1a2b3c" />\n    </svg>\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(2);
+});

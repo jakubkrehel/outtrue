@@ -40,20 +40,30 @@ const NOT_A_COLOR = new RegExp(
   ].join("|")})$`,
 );
 
-function isColor(value: string) {
-  return value.startsWith("[")
-    ? ARBITRARY_COLOR.test(value)
-    : !NOT_A_COLOR.test(value);
+const SIDED = /^[xytrblse]-(.+)$/;
+
+function isColor(value: string, sizes: string[]) {
+  if (value.startsWith("[")) {
+    return ARBITRARY_COLOR.test(value);
+  }
+  const unsided = SIDED.exec(value)?.[1] ?? value;
+  return !(
+    NOT_A_COLOR.test(value) ||
+    sizes.includes(value) ||
+    sizes.includes(unsided)
+  );
 }
 
 export const noThemeOverrides = ratcheted<{
   functions?: string[];
   primitives?: string[];
+  sizes?: string[];
   variants?: string[];
 }>(
   {
     functions: { items: { type: "string" }, type: "array" },
     primitives: { items: { type: "string" }, type: "array" },
+    sizes: { items: { type: "string" }, type: "array" },
     variants: { items: { type: "string" }, type: "array" },
   },
   (
@@ -61,6 +71,7 @@ export const noThemeOverrides = ratcheted<{
     {
       functions = CLASS_FUNCTIONS,
       primitives = ["src/design-system"],
+      sizes = ["hairline", "thin", "thick"],
       variants = ["dark"],
     },
     report,
@@ -75,7 +86,7 @@ export const noThemeOverrides = ratcheted<{
             .split(":")
             .find((variant) => variants.includes(variant));
           const value = COLOR_UTILITY.exec(utilityOf(token))?.[2];
-          if (theme && value && isColor(value)) {
+          if (theme && value && isColor(value, sizes)) {
             report({
               message: `${token} sets a color for the ${theme} theme at the call site. Use a token that changes with the theme, or add one.`,
               node,

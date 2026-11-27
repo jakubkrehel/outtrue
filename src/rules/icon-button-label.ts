@@ -3,8 +3,31 @@ import {
   elementName,
   elementOf,
   type Node,
+  stringAttribute,
+  valueNode,
 } from "../lib/ast.ts";
 import { ratcheted } from "../lib/ratchet.ts";
+
+const INTERACTIVE = new Set(["a", "button", "summary"]);
+
+function isSilent(opening: Node) {
+  const hidden = (opening.attributes ?? []).find(
+    (attribute) => attributeName(attribute) === "aria-hidden",
+  );
+  if (hidden) {
+    const held = valueNode(hidden);
+    const value =
+      held?.type === "JSXExpressionContainer" ? held.expression : held;
+    const exposed =
+      value?.type === "Literal" &&
+      (value.value === false || value.value === "false");
+    if (!exposed) {
+      return true;
+    }
+  }
+  const as = stringAttribute(opening, "as");
+  return typeof as === "string" && !INTERACTIVE.has(as);
+}
 
 export const iconButtonLabel = ratcheted<{
   components?: string[];
@@ -30,7 +53,7 @@ export const iconButtonLabel = ratcheted<{
       JSXElement(node: Node) {
         const opening = node.openingElement;
         const name = opening ? elementName(elementOf(opening)) : "";
-        if (!(opening && components.includes(name))) {
+        if (!(opening && components.includes(name)) || isSilent(opening)) {
           return;
         }
         const attributes = opening.attributes ?? [];
