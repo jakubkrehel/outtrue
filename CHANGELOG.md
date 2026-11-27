@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1
+
+2026-11-27
+
+- `layout-only-classname` takes `allowFor`, which lists `allow` patterns per component name, such as padding on `Card` or `Dialog.Content`.
+- `layout-only-classname` tests `allow` patterns against a class with its variants as well as without, so `hover:bg-muted` can be allowed while `bg-muted` is still reported.
+- `no-cross-surface-imports` takes `composers`, the surfaces that may import any other, such as an app shell.
+
 ## 0.2.0
 
 2026-11-25

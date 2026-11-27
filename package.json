@@ -1,6 +1,6 @@
 {
   "name": "outtrue",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Oxlint rules that keep code on the design system: tokens, props, imports and composition.",
   "keywords": [
     "agents",
