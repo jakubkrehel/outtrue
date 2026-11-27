@@ -1,4 +1,5 @@
 import {
+  attributeName,
   elementOf,
   nameOf,
   type Node,
@@ -61,7 +62,12 @@ export const noRebuiltPrimitives = ratcheted<{
         if (!tag || tag !== tag.toLowerCase()) {
           return;
         }
-        const type = stringAttribute(node, "type");
+        const hidden =
+          tag === "input" &&
+          (node.attributes ?? []).some(
+            (attribute) => attributeName(attribute) === "hidden",
+          );
+        const type = hidden ? "hidden" : stringAttribute(node, "type");
         const replacement =
           (type === null ? undefined : replacements[`${tag}[type=${type}]`]) ??
           replacements[tag];
@@ -72,7 +78,7 @@ export const noRebuiltPrimitives = ratcheted<{
           });
         }
         const attribute = classAttribute(node);
-        if (!(layer && attribute)) {
+        if (!(layer && attribute) || tag === "output") {
           return;
         }
         const utilities = new Set(

@@ -3,8 +3,22 @@ import {
   elementName,
   elementOf,
   type Node,
+  stringAttribute,
 } from "../lib/ast.ts";
 import { ratcheted } from "../lib/ratchet.ts";
+
+const INTERACTIVE = new Set(["a", "button", "summary"]);
+
+function isSilent(opening: Node) {
+  const hidden = (opening.attributes ?? []).some(
+    (attribute) => attributeName(attribute) === "aria-hidden",
+  );
+  if (hidden && stringAttribute(opening, "aria-hidden") !== "false") {
+    return true;
+  }
+  const as = stringAttribute(opening, "as");
+  return typeof as === "string" && !INTERACTIVE.has(as);
+}
 
 export const iconButtonLabel = ratcheted<{
   components?: string[];
@@ -30,7 +44,7 @@ export const iconButtonLabel = ratcheted<{
       JSXElement(node: Node) {
         const opening = node.openingElement;
         const name = opening ? elementName(elementOf(opening)) : "";
-        if (!(opening && components.includes(name))) {
+        if (!(opening && components.includes(name)) || isSilent(opening)) {
           return;
         }
         const attributes = opening.attributes ?? [];

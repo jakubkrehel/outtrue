@@ -50,3 +50,29 @@ test("reports a color on a side or an offset", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(6);
 });
+
+test("accepts a named width on a side or on every side", () => {
+  const result = lint("no-theme-overrides", {
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <div className="dark:border-hairline dark:border-t-hairline dark:outline-hairline dark:ring-thick dark:border-x-thin dark:border-t-red-500" />\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+});
+
+test("reads more width names from the sizes option", () => {
+  const result = lint(
+    "no-theme-overrides",
+    {
+      "src/app/page.tsx":
+        'export default function Fixture() {\n  return <div className="dark:border-chunky dark:border-hairline" />;\n}\n',
+    },
+    { sizes: ["chunky"] },
+  );
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain(
+    "dark:border-hairline",
+  );
+});

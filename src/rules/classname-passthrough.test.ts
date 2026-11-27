@@ -18,3 +18,12 @@ test("reports className that never reaches an element", () => {
 
   expect(result["src/design-system/components/frame.tsx"]).toHaveLength(0);
 });
+
+test("follows className under the name it was destructured to", () => {
+  const result = lint("classname-passthrough", {
+    "src/design-system/components/frame.tsx":
+      'export function Frame({\n  className: rootClassName,\n  ...props\n}: {\n  className?: string;\n}) {\n  return <div {...props} className={rootClassName} />;\n}\n\nexport function Panel({\n  className: panelClassName = "",\n}: {\n  className?: string;\n}) {\n  return <div className={["panel", panelClassName].join(" ")} />;\n}\n\nexport function Dropped({\n  className: unused,\n  label,\n}: {\n  className?: string;\n  label: string;\n}) {\n  return <div>{label}</div>;\n}\n',
+  });
+
+  expect(result["src/design-system/components/frame.tsx"]).toHaveLength(1);
+});

@@ -16,6 +16,20 @@ import { ratcheted } from "../lib/ratchet.ts";
 const COLOR =
   /^(?:#(?:[\da-f]{3,4}|[\da-f]{6}|[\da-f]{8})|(?:rgba?|hsla?|oklch|oklab|lab|lch|color)\(.+\))$/i;
 
+const NUMBER_SIGN = /^#\d+$/;
+
+const COLOR_ATTRIBUTES = new Set([
+  "color",
+  "fill",
+  "flood-color",
+  "floodColor",
+  "lighting-color",
+  "lightingColor",
+  "stop-color",
+  "stopColor",
+  "stroke",
+]);
+
 const LENGTH = /^(-?\d*\.?\d+)(px|rem)$/;
 
 const COLOR_INSIDE =
@@ -114,11 +128,12 @@ export const noRawValues = ratcheted<{
         }
       }
     });
-    const reportColor = (node: Node | undefined) => {
+    const reportColor = (node: Node | undefined, paints = true) => {
       if (
         node?.type === "Literal" &&
         typeof node.value === "string" &&
-        COLOR.test(node.value)
+        COLOR.test(node.value) &&
+        (paints || !NUMBER_SIGN.test(node.value))
       ) {
         report({
           message: `${node.value} is a hardcoded color. Use a color token: a class, currentColor or a CSS variable.`,
@@ -137,7 +152,7 @@ export const noRawValues = ratcheted<{
           return;
         }
         const value = valueNode(node);
-        reportColor(value);
+        reportColor(value, COLOR_ATTRIBUTES.has(attributeName(node) ?? ""));
         const style = value?.expression;
         if (
           attributeName(node) === "style" &&

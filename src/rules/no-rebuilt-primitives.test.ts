@@ -62,3 +62,18 @@ test("trusts the elements option without looking for the files", () => {
 
   expect(result["src/app/page.tsx"]?.join("\n")).toContain("Use Link.");
 });
+
+test("leaves a hidden input and a status element that fills the screen", () => {
+  const result = lint("no-rebuilt-primitives", {
+    "src/design-system/components/dialog.tsx": PRIMITIVE,
+    "src/design-system/components/input.tsx": PRIMITIVE,
+    "src/app/page.tsx":
+      'export default function Fixture() {\n  return (\n    <output className="fixed inset-0">\n      <input hidden readOnly value="name" />\n      <input readOnly value="name" />\n    </output>\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain(
+    "<input> rebuilds a primitive",
+  );
+});
