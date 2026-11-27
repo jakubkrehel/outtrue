@@ -48,3 +48,22 @@ test("accepts an import from the primitives when they sit beside the surfaces", 
 
   expect(result["src/components/billing/plan.tsx"]).toHaveLength(0);
 });
+
+test("accepts any import made by a composing surface", () => {
+  const result = lint(
+    "no-cross-surface-imports",
+    {
+      "src/components/billing/checkout.tsx":
+        'import { Shell } from "@/components/shell/shell";\n\nexport const Checkout = Shell;\n',
+      "src/components/shell/shell.tsx":
+        'import { Checkout } from "@/components/billing/checkout";\n\nexport const Shell = Checkout;\n',
+    },
+    {
+      composers: ["shell"],
+    },
+  );
+
+  expect(result["src/components/shell/shell.tsx"]).toHaveLength(0);
+
+  expect(result["src/components/billing/checkout.tsx"]).toHaveLength(1);
+});

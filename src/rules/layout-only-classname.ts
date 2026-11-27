@@ -38,19 +38,35 @@ const LAYOUT = new RegExp(
 export const layoutOnlyClassName = ratcheted<{
   alias?: Record<string, string>;
   allow?: string[];
+  allowFor?: Record<string, string[]>;
   primitives?: string[];
 }>(
   {
     alias: { additionalProperties: { type: "string" }, type: "object" },
     allow: { items: { type: "string" }, type: "array" },
+    allowFor: {
+      additionalProperties: { items: { type: "string" }, type: "array" },
+      type: "object",
+    },
     primitives: { items: { type: "string" }, type: "array" },
   },
   (
     file,
-    { alias, allow = [], primitives = ["@/design-system/components/"] },
+    {
+      alias,
+      allow = [],
+      allowFor = {},
+      primitives = ["@/design-system/components/"],
+    },
     report,
   ) => {
     const allowed = allow.map((pattern) => new RegExp(pattern));
+    const allowedFor = new Map(
+      Object.entries(allowFor).map(([name, patterns]) => [
+        name,
+        patterns.map((pattern) => new RegExp(pattern)),
+      ]),
+    );
     const { collect, sources } = primitiveImports(primitives, file, alias);
     return {
       ImportDeclaration: collect,
@@ -61,13 +77,19 @@ export const layoutOnlyClassName = ratcheted<{
         if (!(source && attribute)) {
           return;
         }
+        const permitted = [
+          ...allowed,
+          ...(allowedFor.get(elementName(element)) ?? []),
+        ];
         const restyles = classStrings(valueNode(attribute))
           .flatMap(({ text }) => tokensOf(text))
           .filter((token) => {
             const utility = utilityOf(token);
             return !(
               LAYOUT.test(utility) ||
-              allowed.some((pattern) => pattern.test(utility))
+              permitted.some(
+                (pattern) => pattern.test(utility) || pattern.test(token),
+              )
             );
           });
         if (restyles.length === 0) {

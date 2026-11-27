@@ -97,3 +97,42 @@ test("leaves elements and components from other folders alone", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(0);
 });
+
+test("accepts classes the allowFor option lists for that component only", () => {
+  const result = lint(
+    "layout-only-classname",
+    {
+      "src/app/page.tsx":
+        'import { Button } from "@/design-system/components/button";\nimport { Card } from "@/design-system/components/card";\nimport { Dialog } from "@/design-system/components/dialog";\nexport default function Fixture() {\n  return (\n    <Card className="p-4">\n      <Dialog.Content className="px-6 pt-10" />\n      <Button className="px-6">Save</Button>\n    </Card>\n  );\n}\n',
+    },
+    {
+      allowFor: {
+        Card: ["^p[xytrblse]?-.+$"],
+        "Dialog.Content": ["^p[xytrblse]?-.+$"],
+      },
+    },
+  );
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain("<Button>");
+});
+
+test("matches an allow pattern against the class with its variants", () => {
+  const result = lint(
+    "layout-only-classname",
+    {
+      "src/app/page.tsx":
+        'import { Text } from "@/design-system/components/text";\nexport default function Fixture() {\n  return (\n    <Text className="group-hover:text-primary text-secondary">Save</Text>\n  );\n}\n',
+    },
+    {
+      allow: ["^(?:group-)?hover:text-.+$"],
+    },
+  );
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+
+  expect(result["src/app/page.tsx"]?.join("\n")).toContain(
+    "text-secondary restyles the component",
+  );
+});
