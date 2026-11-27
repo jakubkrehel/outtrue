@@ -3,12 +3,14 @@ import { ratcheted } from "../lib/ratchet.ts";
 
 export const noCrossSurfaceImports = ratcheted<{
   alias?: Record<string, string>;
+  composers?: string[];
   primitives?: string;
   shared?: string[];
   surfaces?: string[];
 }>(
   {
     alias: { additionalProperties: { type: "string" }, type: "object" },
+    composers: { items: { type: "string" }, type: "array" },
     primitives: { type: "string" },
     shared: { items: { type: "string" }, type: "array" },
     surfaces: { items: { type: "string" }, type: "array" },
@@ -17,6 +19,7 @@ export const noCrossSurfaceImports = ratcheted<{
     file,
     {
       alias = { "@/": "src/" },
+      composers = [],
       primitives = "src/design-system/components",
       shared = [],
       surfaces = ["src/components"],
@@ -40,7 +43,13 @@ export const noCrossSurfaceImports = ratcheted<{
     const from = surfaceOf(file);
     return importVisitor(file, alias, (target, node) => {
       const to = surfaceOf(target);
-      if (from && to && to !== from && !shared.includes(to)) {
+      if (
+        from &&
+        to &&
+        to !== from &&
+        !shared.includes(to) &&
+        !composers.includes(from)
+      ) {
         report({
           message: `${from} imports from ${to}. A component two parts of the product use belongs to the design system. Move it to ${primitives}, or pass it in through props.`,
           node,
