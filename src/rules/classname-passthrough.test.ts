@@ -27,3 +27,12 @@ test("follows className under the name it was destructured to", () => {
 
   expect(result["src/design-system/components/frame.tsx"]).toHaveLength(1);
 });
+
+test("follows className forwarded through a destructuring default", () => {
+  const result = lint("classname-passthrough", {
+    "src/design-system/components/frame.tsx":
+      "export default function Frame({\n  className,\n  slots,\n}: {\n  className?: string;\n  slots: { rootClassName?: string };\n}) {\n  const { rootClassName = className } = slots;\n  return <div className={rootClassName} />;\n}\n",
+  });
+
+  expect(result["src/design-system/components/frame.tsx"]).toHaveLength(0);
+});

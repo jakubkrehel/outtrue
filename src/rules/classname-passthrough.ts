@@ -53,6 +53,7 @@ export const classNamePassthrough = ratcheted<{ primitives?: string[] }>(
         const binds =
           isPatternProperty(parent) ||
           (parent?.type === "AssignmentPattern" &&
+            parent.left === node &&
             isPatternProperty(parent.parent));
         if (name === "className" && isPatternProperty(parent)) {
           const frame = open.at(-1);

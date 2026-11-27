@@ -23,3 +23,12 @@ test("leaves a button that assistive technology cannot reach", () => {
 
   expect(result["src/app/page.tsx"]).toHaveLength(2);
 });
+
+test("reports an icon button whose aria-hidden is the boolean false", () => {
+  const result = lint("icon-button-label", {
+    "src/app/page.tsx":
+      'import { Button } from "@/design-system/components/button";\nimport { PlusIcon } from "@/icons";\n\nexport default function Fixture() {\n  return (\n    <div>\n      <Button aria-hidden={false}>\n        <PlusIcon />\n      </Button>\n      <Button aria-hidden={true}>\n        <PlusIcon />\n      </Button>\n    </div>\n  );\n}\n',
+  });
+
+  expect(result["src/app/page.tsx"]).toHaveLength(1);
+});
