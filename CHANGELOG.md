@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.2
+
+2026-11-27
+
+- `icon-button-label` leaves a button with `aria-hidden`, or one rendered as a non-interactive element through a literal `as` prop. `aria-hidden={false}` and `aria-hidden="false"` are still reported.
+- `no-theme-overrides` no longer reads a named width such as `border-hairline` or `border-t-hairline` as a color. It takes `sizes`, which lists more width names.
+- `no-rebuilt-primitives` counts `<input hidden>` as a hidden input, and no longer reports an `<output>` that fills the screen as a hand-built overlay.
+- `classname-passthrough` follows `className` under the name it was destructured to, and when it is forwarded as the fallback of a destructuring default.
+- `no-raw-values` reads a number sign followed only by digits, such as `#1234`, as text unless the attribute paints, like `fill` or `stroke`.
+
 ## 0.2.1
 
 2026-11-27
